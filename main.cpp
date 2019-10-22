@@ -36,21 +36,40 @@ public:
 	}
 };
 
-
-int walkDirection = 0;
+enum SpriteState
+{
+	IDLE1, IDLE2, LEFT, RIGHT, DOWN,UP
+} spriteState;
 sf::Texture texture;
 sf::Time spriteTime;
 AnimatedSprite sprite(16);
-
+float speed = 5;
 void update(sf::Time deltaTime)
 {
+	// Sprite position
+	sf::Vector2f offset;
+	switch (spriteState)
+	{
+		case UP:
+			offset.y = -speed;
+			break;
+		case DOWN:
+			offset.y = speed;
+			break;
+		case LEFT:
+			offset.x = -speed;
+			break;
+		case RIGHT:
+			offset.x = speed;
+			break;
+	}
+	sprite.setPosition(sprite.getPosition()+offset);
 
-	sprite.setPosition(sprite.getPosition()+sf::Vector2f(walkDirection*5,0));
-	if(walkDirection!=0)
+	// Sprite graphics
+	if(spriteState!=IDLE1)
 	{
 		spriteTime += deltaTime;
-		if(walkDirection == 1) sprite.setAnimationNumber(0);
-		else sprite.setAnimationNumber(1);
+		sprite.setAnimationNumber(spriteState);
 	}
 	else
 	{
@@ -63,13 +82,12 @@ void update(sf::Time deltaTime)
 		sprite.advanceFrame(1);
 		spriteTime -= sf::milliseconds(30);
 	}
-
 }
 
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(800, 600), "SFML works!");
-	texture.loadFromFile("combined.png");
+	texture.loadFromFile("images/robotsprite.png");
 	sprite.setTexture(texture);
 	//sprite.setScale(2.0f,2.0f);
 	sprite.setPosition(0,200);
@@ -89,26 +107,42 @@ int main()
 			{
 				if (event.key.code == sf::Keyboard::Left)
 				{
-					walkDirection = -1;
+					spriteState = LEFT;
 				}
 				else if (event.key.code == sf::Keyboard::Right)
 				{
-					walkDirection = 1;
+					spriteState = RIGHT;
+				}
+				else if (event.key.code == sf::Keyboard::Up)
+				{
+					spriteState = UP;
+				}
+				else if (event.key.code == sf::Keyboard::Down)
+				{
+					spriteState = DOWN;
 				}
 			}
 			else if(event.type == sf::Event::KeyReleased)
 			{
-				if (event.key.code == sf::Keyboard::Left || event.key.code == sf::Keyboard::Right)
+				if (event.key.code == sf::Keyboard::Left || event.key.code == sf::Keyboard::Right || event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down)
 				{
-					walkDirection = 0;
+					spriteState = IDLE1;
 				}
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 				{
-					walkDirection = -1;
+					spriteState = LEFT;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 				{
-					walkDirection = 1;
+					spriteState = RIGHT;
+				}
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+				{
+					spriteState = UP;
+				}
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+				{
+					spriteState = DOWN;
 				}
 			}
 		}
