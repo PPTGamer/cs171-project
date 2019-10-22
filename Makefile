@@ -7,9 +7,9 @@ EXENAME = Project
 DEBUGOUT = compile.out
 
 ifeq ("$(GCC_VERSION)", "8.2.0")
-	SFMLDIR=SFML-2.5.1-build-mingw_8.2.0-x86_64
+	SFMLDIR=libs/SFML-2.5.1-build-mingw_8.2.0-x86_64
 else
-	SFMLDIR=SFML-2.5.1-build-msys2_9.2.0-x86-64
+	SFMLDIR=libs/SFML-2.5.1-build-msys2_9.2.0-x86-64
 endif
 .PHONY: clean 
 make: clean
