@@ -1,5 +1,6 @@
 CXX=g++
 GCC_VERSION = $(shell $(CXX) -dumpversion)
+FILES = main.cpp Game.cpp
 GCCFLAGS= -static-libgcc -static-libstdc++ -DSFML_STATIC 
 LINKER= -I$(SFMLDIR)/include -L$(SFMLDIR)/lib
 LIBRARIES=-lsfml-graphics-s -lsfml-window-s -lsfml-audio-s -lsfml-system-s -lopengl32  -lwinmm  -lgdi32
@@ -15,7 +16,7 @@ endif
 make: clean
 	@echo Using SFML libs in $(SFMLDIR).
 	@echo Compiling...
-	$(CXX) main.cpp -o $(EXENAME).exe $(GCCFLAGS) $(LINKER) $(LIBRARIES) 2>$(DEBUGOUT)
+	$(CXX) $(FILES) -o $(EXENAME).exe $(GCCFLAGS) $(LINKER) $(LIBRARIES) 2>$(DEBUGOUT)
 	@if exist $(EXENAME).exe (echo Compilation successful.) else (echo Compilation unsuccessful, refer to $(DEBUGOUT) for errors.)
 
 clean:
