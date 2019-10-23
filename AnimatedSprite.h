@@ -15,6 +15,7 @@ public:
 	{
 		animationFrame = 0;
 		animationNumber = 0;
+		refreshFrame();
 	}
 	void setAnimationLength(int frames)
 	{
