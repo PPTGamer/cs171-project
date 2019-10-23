@@ -6,7 +6,8 @@ Game::Game(): gameState(DEFAULT)
 	sf::Time startTime = loadingTime.restart();
 
 	// do all loading here
-	robot = std::make_shared<Robot>("images/robotsprite.png");
+	textureManager.loadTexture("robotsprite.png");
+	robot = std::make_shared<Robot>(textureManager.getTexture("robotsprite.png"));
 
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
 }

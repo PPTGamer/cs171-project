@@ -1,6 +1,6 @@
 CXX=g++
 GCC_VERSION = $(shell $(CXX) -dumpversion)
-FILES = main.cpp Game.cpp
+FILES = main.cpp Game.cpp TextureManager.cpp
 GCCFLAGS= -static-libgcc -static-libstdc++ -DSFML_STATIC 
 LINKER= -I$(SFMLDIR)/include -L$(SFMLDIR)/lib
 LIBRARIES=-lsfml-graphics-s -lsfml-window-s -lsfml-audio-s -lsfml-system-s -lopengl32  -lwinmm  -lgdi32
