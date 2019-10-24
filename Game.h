@@ -7,12 +7,13 @@
 #include <SFML/Graphics.hpp>
 
 // Resource managers
-#include "TextureManager.h"
+#include "managers/TextureManager.h"
 
 // Game objects
-#include "GameObject.h"
-#include "GameSprite.h"
-#include "Robot.h"
+#include "gameobj/GameObject.h"
+#include "gameobj/GameSprite.h"
+#include "gameobj/AllObjects.h"
+
 class Game
 {
 public:
