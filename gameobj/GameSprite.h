@@ -8,6 +8,6 @@ class GameSprite : public GameObject
 public:
 	GameSprite(){};
 	virtual void update(sf::Time deltaTime){};
-	virtual sf::Sprite getSprite(){};
+	virtual sf::Sprite getSprite(){return sf::Sprite();};
 };
 #endif

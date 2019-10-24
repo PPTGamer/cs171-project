@@ -12,7 +12,6 @@ int main()
 	sf::Clock clock;
 	const sf::Time update_ms = sf::seconds(1.f / 60.f);
 	sf::Time elapsed = clock.restart();
-	sf::Time spriteTime;
 	while (window.isOpen())
 	{
 		//input
