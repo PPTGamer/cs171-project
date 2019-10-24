@@ -1,13 +1,17 @@
 #ifndef GAME_H
 #define GAME_H
 // Standard libraries
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <memory>
 #include <SFML/Graphics.hpp>
 
 // Resource managers
 #include "TextureManager.h"
 
 // Game objects
+#include "GameObject.h"
+#include "GameSprite.h"
 #include "Robot.h"
 class Game
 {
@@ -26,7 +30,8 @@ private:
 	TextureManager textureManager;
 
 	// Game objects
-	std::shared_ptr<Robot> robot;
+	std::vector<GameObject*> gameObjects;
+	Robot* robot;
 };
 
 #endif

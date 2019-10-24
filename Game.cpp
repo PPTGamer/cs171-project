@@ -7,7 +7,8 @@ Game::Game(): gameState(DEFAULT)
 
 	// do all loading here
 	textureManager.loadTexture("robotsprite.png");
-	robot = std::make_shared<Robot>(textureManager.getTexture("robotsprite.png"));
+	robot = new Robot(textureManager.getTexture("robotsprite.png"));
+	gameObjects.push_back(robot);
 
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
 }
@@ -84,7 +85,10 @@ void Game::handleInput(sf::RenderWindow& window)
 **/
 void Game::update(sf::Time deltaTime)
 {
-	robot->update(deltaTime);
+	for(auto&& gameObject : gameObjects)
+	{
+		gameObject->update(deltaTime);
+	}
 }
 
 /**
@@ -92,5 +96,11 @@ void Game::update(sf::Time deltaTime)
 **/
 void Game::draw(sf::RenderTarget& target)
 {
-	target.draw(robot->getSprite());
+	for(auto const &gameObjectPtr : gameObjects)
+	{
+		if (GameSprite* gameSprite = dynamic_cast<GameSprite*>(gameObjectPtr))
+		{
+			target.draw(gameSprite->getSprite());
+		}
+	}
 }

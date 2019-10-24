@@ -2,7 +2,7 @@
 #define ROBOT_H
 #include <SFML/Graphics.hpp>
 #include "AnimatedSprite.h"
-class Robot
+class Robot : public GameSprite
 {
 	AnimatedSprite sprite;
 	sf::Texture* texture;

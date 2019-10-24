@@ -1,4 +1,3 @@
-#include <bits/stdc++.h>
 #include <SFML/Graphics.hpp>
 #include "Game.h"
 
@@ -8,6 +7,7 @@ int main()
 
 	// create an 800x600 window, respect DPI settings.
 	sf::RenderWindow window(sf::VideoMode(800, 600, sf::VideoMode::getDesktopMode().bitsPerPixel), "SFML works!");
+	window.setFramerateLimit(60);
 	
 	sf::Clock clock;
 	const sf::Time update_ms = sf::seconds(1.f / 60.f);
