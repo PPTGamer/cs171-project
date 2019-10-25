@@ -34,7 +34,21 @@ void Game::handleInput(sf::RenderWindow& window)
 			currView.setViewport(sf::FloatRect((w-usedWidth)/(2*w),0.0f,usedWidth/w,1.0f));
 			window.setView(currView);
 		}
-
+		if (event.type == sf::Event::MouseButtonPressed)
+		{
+			if (event.mouseButton.button == sf::Mouse::Left)
+			{
+				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+				robot->moveTo(window.mapPixelToCoords(pixelCoordinates));
+			}
+			if (event.mouseButton.button == sf::Mouse::Right)
+			{
+				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+				pixelCoordinates.x = lrint(pixelCoordinates.x/64.0)*64;
+				pixelCoordinates.y = lrint(pixelCoordinates.y/64.0)*64;
+				robot->moveTo(window.mapPixelToCoords(pixelCoordinates));
+			}
+		}
 		if(event.type == sf::Event::KeyPressed)
 		{
 			if (event.key.code == sf::Keyboard::Left)
