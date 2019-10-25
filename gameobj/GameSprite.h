@@ -3,11 +3,11 @@
 #include <SFML/Graphics.hpp>
 #include "GameObject.h"
 
-class GameSprite : public GameObject
+class GameSprite : public GameObject, public sf::Drawable
 {
 public:
 	GameSprite(){};
 	virtual void update(sf::Time deltaTime){};
-	virtual sf::Sprite getSprite(){return sf::Sprite();};
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const {};
 };
 #endif

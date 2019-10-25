@@ -76,9 +76,9 @@ public:
 			spriteTime -= timePerFrame;
 		}
 	}
-	sf::Sprite getSprite() override
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
 	{
-		return sprite;
+		target.draw(sprite, states);
 	}
 };
 

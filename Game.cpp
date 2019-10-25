@@ -100,7 +100,7 @@ void Game::draw(sf::RenderTarget& target)
 	{
 		if (GameSprite* gameSprite = dynamic_cast<GameSprite*>(gameObjectPtr))
 		{
-			target.draw(gameSprite->getSprite());
+			gameSprite->draw(target, sf::RenderStates::Default);
 		}
 	}
 }
