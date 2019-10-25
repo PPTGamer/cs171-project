@@ -6,10 +6,11 @@ Game::Game(): gameState(DEFAULT)
 	sf::Time startTime = loadingTime.restart();
 
 	// do all loading here
+	gameObjects.push_back(new MazeDisplay());
 	textureManager.loadTexture("robotsprite.png");
 	robot = new Robot(textureManager.getTexture("robotsprite.png"));
 	gameObjects.push_back(robot);
-
+	
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
 }
 
