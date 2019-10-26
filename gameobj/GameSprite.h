@@ -7,7 +7,7 @@ class GameSprite : public GameObject, public sf::Drawable
 {
 public:
 	GameSprite(){};
-	virtual void update(sf::Time deltaTime){};
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const {};
+	virtual void update(sf::Time deltaTime) = 0;
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 };
 #endif

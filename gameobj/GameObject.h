@@ -5,6 +5,6 @@ class GameObject
 {
 public:
 	GameObject(){};
-	virtual void update(sf::Time deltaTime){};
+	virtual void update(sf::Time deltaTime) = 0;
 };
 #endif
