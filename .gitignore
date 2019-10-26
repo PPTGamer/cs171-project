@@ -1,4 +1,5 @@
 .vscode
+images/*.pdn
 SFML-2.5.1-source
 *.exe
 *.out

@@ -6,7 +6,8 @@ Game::Game(): gameState(DEFAULT)
 	sf::Time startTime = loadingTime.restart();
 
 	// do all loading here
-	gameObjects.push_back(new MazeDisplay());
+	textureManager.loadTexture("crate.png");
+	gameObjects.push_back(new MazeDisplay(textureManager.getTexture("crate.png")));
 	textureManager.loadTexture("robotsprite.png");
 	robot = new Robot(textureManager.getTexture("robotsprite.png"));
 	gameObjects.push_back(robot);
