@@ -57,11 +57,23 @@ void Game::handleInput(sf::RenderWindow& window)
 				sf::Vector2i tileCoordinates = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
 				mazeDisplay->setMark(tileCoordinates.x, tileCoordinates.y, sf::Color::Yellow, "test");
 			}
-			if(sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
+			else if(sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
 			{
 				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
 				sf::Vector2i tileCoordinates = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
 				mazeDisplay->clearMark(tileCoordinates.x, tileCoordinates.y);
+			}
+			else if (event.mouseButton.button == sf::Mouse::Left)
+			{
+				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+				robot->moveTo(window.mapPixelToCoords(pixelCoordinates));
+			}
+			else if (event.mouseButton.button == sf::Mouse::Right)
+			{
+				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+				pixelCoordinates.x = lrint(pixelCoordinates.x/64.0)*64;
+				pixelCoordinates.y = lrint(pixelCoordinates.y/64.0)*64;
+				robot->moveTo(window.mapPixelToCoords(pixelCoordinates));
 			}
 		}
 		if(event.type == sf::Event::KeyPressed)
