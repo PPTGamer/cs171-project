@@ -22,9 +22,9 @@ void Robot::moveTo(sf::Vector2f destination)
 	if (!indicators.empty())
 	{
 		float distance = hypotf(destination.x - movementQueue.back().x, destination.y - movementQueue.back().y);
-		sf::RectangleShape line(sf::Vector2f(distance, 5.0f));
+		sf::RectangleShape line(sf::Vector2f(distance, 3.0f));
 		line.setFillColor(sf::Color::Red);
-		line.setOrigin(0,2.5);
+		line.setOrigin(0,1.5);
 		line.setPosition(movementQueue.back());
 		line.setRotation(
 			atan2(destination.y - movementQueue.back().y, destination.x-movementQueue.back().x) 
@@ -34,6 +34,7 @@ void Robot::moveTo(sf::Vector2f destination)
 	}
 	movementQueue.push_back(destination);
 	sf::CircleShape indicator;
+	indicator.setPointCount(6);
 	indicator.setRadius(10);
 	indicator.setOrigin(indicator.getRadius(), indicator.getRadius());
 	indicator.setFillColor(sf::Color::Red);
@@ -118,6 +119,11 @@ void Robot::update(sf::Time deltaTime)
 	{
 		sprite.advanceFrame(1);
 		spriteTime -= timePerFrame;
+	}
+
+	for (auto&& indicator : indicators)
+	{
+		indicator.rotate(2);
 	}
 }
 
