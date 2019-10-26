@@ -33,6 +33,7 @@ private:
 	// Game objects
 	std::vector<GameObject*> gameObjects;
 	Robot* robot;
+	MazeDisplay* mazeDisplay;
 };
 
 #endif

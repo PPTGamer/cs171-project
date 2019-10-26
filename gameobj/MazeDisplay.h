@@ -71,6 +71,11 @@ public:
 		this->wallTexture = wallTexture;
 		refreshTiles();
 	}
+	sf::Vector2i getSize()
+	{
+		sf::Vector2i mazeSize = maze.getSize();
+		return sf::Vector2i(mazeSize.x * TILE_SIZE, mazeSize.y * TILE_SIZE);
+	}
 	void setPosition(sf::Vector2f position)
 	{
 		this->position = position;

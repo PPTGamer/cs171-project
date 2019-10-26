@@ -7,7 +7,13 @@ Game::Game(): gameState(DEFAULT)
 
 	// do all loading here
 	textureManager.loadTexture("crate.png");
-	gameObjects.push_back(new MazeDisplay(textureManager.getTexture("crate.png")));
+	mazeDisplay = new MazeDisplay(textureManager.getTexture("crate.png"));
+	gameObjects.push_back(mazeDisplay);
+	mazeDisplay->setPosition(sf::Vector2f(
+		400-mazeDisplay->getSize().x/2.0, 
+		300-mazeDisplay->getSize().y/2.0
+	));
+
 	textureManager.loadTexture("robotsprite.png");
 	robot = new Robot(textureManager.getTexture("robotsprite.png"));
 	gameObjects.push_back(robot);
