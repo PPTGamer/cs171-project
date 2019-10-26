@@ -1,6 +1,7 @@
 #ifndef MAZE_DISPLAY_H
 #define MAZE_DISPLAY_H
 #include <cstdlib>
+#include <map>
 #include <SFML/Graphics.hpp>
 #include "AnimatedSprite.h"
 #include "../ai/Maze.h"
@@ -12,7 +13,9 @@ private:
 	Maze maze;
 	sf::Texture* wallTexture;
 	sf::Texture* groundTexture;
+	sf::Font displayFont;
 	std::vector<std::vector<sf::RectangleShape>> tiles;
+	std::map<std::pair<int,int>, std::pair<sf::RectangleShape, sf::Text>> indicators;
 	void refreshTiles()
 	{
 		sf::Vector2i mazeSize = maze.getSize();
@@ -65,10 +68,12 @@ private:
 		}
 	}
 public:
-	MazeDisplay(sf::Texture* wallTexture = NULL, sf::Texture* groundTexture = NULL, Maze maze = Maze())
+	MazeDisplay(sf::Font font, sf::Texture* wallTexture = NULL, sf::Texture* groundTexture = NULL, Maze maze = Maze())
 	{
 		this->maze = maze;
 		this->wallTexture = wallTexture;
+		this->groundTexture = groundTexture;
+		this->displayFont = font;
 		refreshTiles();
 	}
 	sf::Vector2i getSize()
@@ -76,12 +81,52 @@ public:
 		sf::Vector2i mazeSize = maze.getSize();
 		return sf::Vector2i(mazeSize.x * TILE_SIZE, mazeSize.y * TILE_SIZE);
 	}
+	void setMark(int column, int row, sf::Color color = sf::Color::Yellow, std::string text = "")
+	{
+		if (column < 0 || row < 0 || column >= maze.getSize().x || row >= maze.getSize().y)
+		{
+			return;
+		}
+		sf::RectangleShape newIndicator = sf::RectangleShape(sf::Vector2f(TILE_SIZE, TILE_SIZE));
+		sf::Text newText;
+		newIndicator.setPosition(sf::Vector2f(column*TILE_SIZE,row*TILE_SIZE) + position);
+
+		color.a = 150;
+		newIndicator.setFillColor(color);
+
+		if (text!="")
+		{
+			newText.setFont(displayFont);
+			newText.setCharacterSize(24);
+			newText.setString(text);
+			newText.setOutlineColor(sf::Color::Black);
+			newText.setOutlineThickness(2);
+			//newText.setOrigin(newText.getLocalBounds().width/2, newText.getLocalBounds().height/2);
+			newText.setPosition(sf::Vector2f(column*TILE_SIZE,row*TILE_SIZE) + position);
+		}
+
+		indicators[std::make_pair(column, row)] = std::make_pair(newIndicator, newText);
+	}
+	void clearMark(int column, int row)
+	{
+		std::pair<int,int> key = std::make_pair(column, row);
+		if(indicators.find(key) != indicators.end())
+		{
+			indicators.erase(key);
+		}
+	}
+	sf::Vector2i getTileAtPixel(sf::Vector2f pixelCoords)
+	{
+		sf::Vector2f target = pixelCoords - position;
+		return sf::Vector2i( (int)(target.x / TILE_SIZE), (int)(target.y / TILE_SIZE) );
+	}
 	void setPosition(sf::Vector2f position)
 	{
 		this->position = position;
 		repositionTiles();
 	}
 	sf::Vector2f getPosition() {return position;}
+	void update(sf::Time deltaTime) {}
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
 	{
 		sf::Vector2i mazeSize = maze.getSize();
@@ -91,6 +136,11 @@ public:
 			{
 				target.draw(tiles[x][y], states);
 			}
+		}
+		for(auto&& indicator : indicators)
+		{
+			target.draw(indicator.second.first, states);
+			target.draw(indicator.second.second, states);
 		}
 	}
 };

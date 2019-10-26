@@ -3,7 +3,7 @@ GCC_VERSION = $(shell $(CXX) -dumpversion)
 FILES = main.cpp Game.cpp managers/*.cpp gameobj/*.cpp
 GCCFLAGS= -static-libgcc -static-libstdc++ -DSFML_STATIC 
 LINKER= -I$(SFMLDIR)/include -L$(SFMLDIR)/lib
-LIBRARIES=-lsfml-graphics-s -lsfml-window-s -lsfml-audio-s -lsfml-system-s -lopengl32  -lwinmm  -lgdi32
+LIBRARIES=-lsfml-graphics-s -lsfml-window-s -lsfml-audio-s -lsfml-system-s -lopengl32  -lwinmm  -lgdi32 -lfreetype
 EXENAME = Project
 DEBUGOUT = compile.out
 

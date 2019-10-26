@@ -6,18 +6,25 @@ Game::Game(): gameState(DEFAULT)
 	sf::Time startTime = loadingTime.restart();
 
 	// do all loading here
+	// Temporary, add to a font manager later
+	if(!HUDFont.loadFromFile("fonts/Inconsolata-Regular.ttf"))
+	{
+		std::cout<<"Unable to load font!"<<std::endl;
+	}
+
 	textureManager.loadTexture("crate.png");
-	mazeDisplay = new MazeDisplay(textureManager.getTexture("crate.png"));
+	mazeDisplay = new MazeDisplay(HUDFont, textureManager.getTexture("crate.png"));
 	gameObjects.push_back(mazeDisplay);
 	mazeDisplay->setPosition(sf::Vector2f(
 		400-mazeDisplay->getSize().x/2.0, 
 		300-mazeDisplay->getSize().y/2.0
 	));
 
+	
 	textureManager.loadTexture("robotsprite.png");
 	robot = new Robot(textureManager.getTexture("robotsprite.png"));
 	gameObjects.push_back(robot);
-	
+
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
 }
 
@@ -42,7 +49,21 @@ void Game::handleInput(sf::RenderWindow& window)
 			currView.setViewport(sf::FloatRect((w-usedWidth)/(2*w),0.0f,usedWidth/w,1.0f));
 			window.setView(currView);
 		}
-
+		if(event.type == sf::Event::MouseButtonPressed)
+		{
+			if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+			{
+				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+				sf::Vector2i tileCoordinates = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
+				mazeDisplay->setMark(tileCoordinates.x, tileCoordinates.y, sf::Color::Yellow, "test");
+			}
+			if(sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
+			{
+				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+				sf::Vector2i tileCoordinates = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
+				mazeDisplay->clearMark(tileCoordinates.x, tileCoordinates.y);
+			}
+		}
 		if(event.type == sf::Event::KeyPressed)
 		{
 			if (event.key.code == sf::Keyboard::Left)

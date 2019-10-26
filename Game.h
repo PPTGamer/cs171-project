@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
 // Resource managers
@@ -34,6 +35,9 @@ private:
 	std::vector<GameObject*> gameObjects;
 	Robot* robot;
 	MazeDisplay* mazeDisplay;
+
+	// Temporary, add to a font manager later
+	sf::Font HUDFont;
 };
 
 #endif
