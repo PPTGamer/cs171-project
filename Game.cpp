@@ -24,6 +24,18 @@ Game::Game(): gameState(SETUP)
 	robot = new Robot(textureManager.getTexture("robotsprite.png"));
 	gameObjects.push_back(robot);
 
+	button1 = new Button(this);
+	button1->setText(&HUDFont, "Button 1");
+	button1->setPosition(100,100);
+	button1->setOnClick([](Game* game){std::cout<<"button 1 clicked!"<<std::endl;});
+	gameObjects.push_back(button1);
+
+	button2 = new Button(this);
+	button2->setText(&HUDFont, "Button 2");
+	button2->setPosition(100,200);
+	button2->setOnClick([](Game* game){std::cout<<"button 2 clicked!"<<std::endl;});
+	gameObjects.push_back(button2);
+
 	this->enterState(GameState::SETUP);
 
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
@@ -51,6 +63,10 @@ void Game::handleInput(sf::RenderWindow& window)
 			window.setView(currView);
 		}
 
+		for (auto&& gameObject : gameObjects)
+		{
+			gameObject->handleInput(event, window);
+		}
 		if (gameState == SETUP)
 		{
 			if (event.type == sf::Event::MouseMoved)

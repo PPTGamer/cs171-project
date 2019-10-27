@@ -39,6 +39,7 @@ private:
 	std::vector<GameObject*> gameObjects;
 	Robot* robot;
 	MazeDisplay* mazeDisplay;
+	Button *button1, *button2;
 	sf::RectangleShape indicator;
 	sf::Text pauseIndicator;
 

@@ -5,5 +5,6 @@
 // This file is included by Game.h in order to #include all game objects
 #include "Robot.h"
 #include "MazeDisplay.h"
+#include "Button.h"
 
 #endif
