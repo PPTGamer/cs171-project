@@ -18,15 +18,19 @@
 class Game
 {
 public:
+	enum GameState
+	{
+		SETUP, RUNNING, PAUSED
+	};
 	Game();
+	void changeState(Game::GameState newGameState);
 	void handleInput(sf::RenderWindow& window);
 	void update(sf::Time deltaTime);
 	void draw(sf::RenderTarget& target);
 private:
-	enum GameState
-	{
-		DEFAULT
-	} gameState;
+	GameState gameState;
+	void enterState(Game::GameState gameState);
+	void exitState(Game::GameState gameState);
 
 	// Resource managers
 	TextureManager textureManager;
@@ -35,6 +39,8 @@ private:
 	std::vector<GameObject*> gameObjects;
 	Robot* robot;
 	MazeDisplay* mazeDisplay;
+	sf::RectangleShape indicator;
+	sf::Text pauseIndicator;
 
 	// Temporary, add to a font manager later
 	sf::Font HUDFont;

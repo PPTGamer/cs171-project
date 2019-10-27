@@ -115,10 +115,23 @@ public:
 			indicators.erase(key);
 		}
 	}
-	sf::Vector2i getTileAtPixel(sf::Vector2f pixelCoords)
+	sf::Vector2i getTileIndexAtPixel(sf::Vector2f pixelCoords)
 	{
 		sf::Vector2f target = pixelCoords - position;
 		return sf::Vector2i( (int)(target.x / TILE_SIZE), (int)(target.y / TILE_SIZE) );
+	}
+	sf::RectangleShape* getTileAtPixel(sf::Vector2f pixelCoords)
+	{
+		sf::Vector2i tileIndex = getTileIndexAtPixel(pixelCoords);
+		int column = tileIndex.x, row = tileIndex.y;
+		if (column < 0 || row < 0 || column >= maze.getSize().x || row >= maze.getSize().y)
+		{
+			return NULL;
+		}
+		else
+		{
+			return &tiles[column][row];
+		}
 	}
 	void setPosition(sf::Vector2f position)
 	{
