@@ -22,6 +22,7 @@ Game::Game(): gameState(SETUP)
 	
 	textureManager.loadTexture("robotsprite.png");
 	robot = new Robot(textureManager.getTexture("robotsprite.png"));
+	robot->setPosition(-999,999);
 	gameObjects.push_back(robot);
 
 	button1 = new Button(this);
@@ -39,6 +40,14 @@ Game::Game(): gameState(SETUP)
 	this->enterState(GameState::SETUP);
 
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
+}
+
+Game::~Game()
+{
+	for (auto&& gameObjectPtr : gameObjects)
+	{
+		delete gameObjectPtr;
+	}
 }
 
 /**
@@ -65,8 +74,9 @@ void Game::handleInput(sf::RenderWindow& window)
 
 		for (auto&& gameObject : gameObjects)
 		{
-			gameObject->handleInput(event, window);
+			gameObject->handleInput(event, window, gameState);
 		}
+		
 		if (gameState == SETUP)
 		{
 			if (event.type == sf::Event::MouseMoved)
@@ -106,74 +116,17 @@ void Game::handleInput(sf::RenderWindow& window)
 			{
 				this->changeState(GameState::PAUSED);
 			}
-			else if(event.type == sf::Event::MouseButtonPressed)
+			else if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
 			{
-				if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
-				{
-					sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-					sf::Vector2i tileCoordinates = mazeDisplay->getTileIndexAtPixel(window.mapPixelToCoords(pixelCoordinates));
-					mazeDisplay->setMark(tileCoordinates.x, tileCoordinates.y, sf::Color::Yellow, "test");
-				}
-				else if(sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
-				{
-					sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-					sf::Vector2i tileCoordinates = mazeDisplay->getTileIndexAtPixel(window.mapPixelToCoords(pixelCoordinates));
-					mazeDisplay->clearMark(tileCoordinates.x, tileCoordinates.y);
-				}
-				else if (event.mouseButton.button == sf::Mouse::Left)
-				{
-					sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-					robot->moveTo(window.mapPixelToCoords(pixelCoordinates));
-				}
-				else if (event.mouseButton.button == sf::Mouse::Right)
-				{
-					sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-					pixelCoordinates.x = lrint(pixelCoordinates.x/64.0)*64;
-					pixelCoordinates.y = lrint(pixelCoordinates.y/64.0)*64;
-					robot->moveTo(window.mapPixelToCoords(pixelCoordinates));
-				}
+				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+				sf::Vector2i tileCoordinates = mazeDisplay->getTileIndexAtPixel(window.mapPixelToCoords(pixelCoordinates));
+				mazeDisplay->setMark(tileCoordinates.x, tileCoordinates.y, sf::Color::Yellow, "test");
 			}
-			else if(event.type == sf::Event::KeyPressed)
+			else if(sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
 			{
-				if (event.key.code == sf::Keyboard::Left)
-				{
-					robot->handleInput("LEFT");
-				}
-				else if (event.key.code == sf::Keyboard::Right)
-				{
-					robot->handleInput("RIGHT");
-				}
-				else if (event.key.code == sf::Keyboard::Up)
-				{
-					robot->handleInput("UP");
-				}
-				else if (event.key.code == sf::Keyboard::Down)
-				{
-					robot->handleInput("DOWN");
-				}
-			}
-			else if(event.type == sf::Event::KeyReleased)
-			{
-				if (event.key.code == sf::Keyboard::Left || event.key.code == sf::Keyboard::Right || event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down)
-				{
-					robot->handleInput("IDLE");
-				}
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-				{
-					robot->handleInput("LEFT");
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-				{
-					robot->handleInput("RIGHT");
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-				{
-					robot->handleInput("UP");
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-				{
-					robot->handleInput("DOWN");
-				}
+				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+				sf::Vector2i tileCoordinates = mazeDisplay->getTileIndexAtPixel(window.mapPixelToCoords(pixelCoordinates));
+				mazeDisplay->clearMark(tileCoordinates.x, tileCoordinates.y);
 			}
 		}
 		else if (gameState == PAUSED)
@@ -186,14 +139,14 @@ void Game::handleInput(sf::RenderWindow& window)
 	}
 }
 
-void Game::changeState(Game::GameState newGameState)
+void Game::changeState(GameState newGameState)
 {
 	this->exitState(this->gameState);
 	this->enterState(newGameState);
 	this->gameState = newGameState;
 }
 
-void Game::enterState(Game::GameState gameState)
+void Game::enterState(GameState gameState)
 {
 	if (gameState == SETUP)
 	{
@@ -219,7 +172,7 @@ void Game::enterState(Game::GameState gameState)
 	}
 }
 
-void Game::exitState(Game::GameState gameState)
+void Game::exitState(GameState gameState)
 {
 	if (gameState == SETUP)
 	{

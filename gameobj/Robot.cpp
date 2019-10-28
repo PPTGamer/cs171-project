@@ -46,6 +46,68 @@ void Robot::moveTo(std::vector<sf::Vector2f> points)
 	for (auto point : points) {moveTo(point);}
 }
 
+void Robot::handleInput(sf::Event event, sf::RenderWindow& window, GameState gameState)
+{
+	if (gameState != GameState::RUNNING) return;
+	if(event.type == sf::Event::MouseButtonPressed)
+	{
+		if (event.mouseButton.button == sf::Mouse::Left)
+		{
+			sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+			this->moveTo(window.mapPixelToCoords(pixelCoordinates));
+		}
+		else if (event.mouseButton.button == sf::Mouse::Right)
+		{
+			sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+			pixelCoordinates.x = lrint(pixelCoordinates.x/64.0)*64;
+			pixelCoordinates.y = lrint(pixelCoordinates.y/64.0)*64;
+			this->moveTo(window.mapPixelToCoords(pixelCoordinates));
+		}
+	}
+	else if(event.type == sf::Event::KeyPressed)
+	{
+		if (event.key.code == sf::Keyboard::Left)
+		{
+			this->handleInput("LEFT");
+		}
+		else if (event.key.code == sf::Keyboard::Right)
+		{
+			this->handleInput("RIGHT");
+		}
+		else if (event.key.code == sf::Keyboard::Up)
+		{
+			this->handleInput("UP");
+		}
+		else if (event.key.code == sf::Keyboard::Down)
+		{
+			this->handleInput("DOWN");
+		}
+	}
+	else if(event.type == sf::Event::KeyReleased)
+	{
+		if (event.key.code == sf::Keyboard::Left || event.key.code == sf::Keyboard::Right || event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down)
+		{
+			this->handleInput("IDLE");
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		{
+			this->handleInput("LEFT");
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		{
+			this->handleInput("RIGHT");
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		{
+			this->handleInput("UP");
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		{
+			this->handleInput("DOWN");
+		}
+	}
+}
+
 void Robot::update(sf::Time deltaTime)
 {
 	// Automatically move according to movement queue

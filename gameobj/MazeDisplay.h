@@ -118,7 +118,7 @@ public:
 	sf::Vector2i getTileIndexAtPixel(sf::Vector2f pixelCoords)
 	{
 		sf::Vector2f target = pixelCoords - position;
-		return sf::Vector2i( (int)(target.x / TILE_SIZE), (int)(target.y / TILE_SIZE) );
+		return sf::Vector2i( (int)floor(target.x / TILE_SIZE), (int)floor(target.y / TILE_SIZE) );
 	}
 	sf::RectangleShape* getTileAtPixel(sf::Vector2f pixelCoords)
 	{

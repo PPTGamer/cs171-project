@@ -7,6 +7,8 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
+#include "enums.h"
+
 // Resource managers
 #include "managers/TextureManager.h"
 
@@ -18,19 +20,16 @@
 class Game
 {
 public:
-	enum GameState
-	{
-		SETUP, RUNNING, PAUSED
-	};
 	Game();
-	void changeState(Game::GameState newGameState);
+	~Game();
+	void changeState(GameState newGameState);
 	void handleInput(sf::RenderWindow& window);
 	void update(sf::Time deltaTime);
 	void draw(sf::RenderTarget& target);
 private:
 	GameState gameState;
-	void enterState(Game::GameState gameState);
-	void exitState(Game::GameState gameState);
+	void enterState(GameState gameState);
+	void exitState(GameState gameState);
 
 	// Resource managers
 	TextureManager textureManager;

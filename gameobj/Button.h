@@ -66,7 +66,7 @@ public:
 	{
 		onClick = function;
 	}
-	void handleInput(sf::Event event, sf::RenderWindow& window) override
+	void handleInput(sf::Event event, sf::RenderWindow& window, GameState gameState) override
 	{
 		if (event.type == sf::Event::MouseButtonPressed)
 		{

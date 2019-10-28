@@ -28,6 +28,7 @@ public:
 	void moveTo(sf::Vector2f destination);
 	void moveTo(std::vector<sf::Vector2f> points);
 	
+	void handleInput(sf::Event event, sf::RenderWindow& window, GameState gameState) override;
 	void update(sf::Time deltaTime) override;
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
