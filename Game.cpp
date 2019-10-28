@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game(): gameState(SETUP)
+Game::Game(): gameState(SET_POSITION)
 {
 	sf::Clock loadingTime;
 	sf::Time startTime = loadingTime.restart();
@@ -26,18 +26,18 @@ Game::Game(): gameState(SETUP)
 	gameObjects.push_back(robot);
 
 	button1 = new Button(this);
-	button1->setText(&HUDFont, "Button 1");
-	button1->setPosition(100,100);
-	button1->setOnClick([](Game* game){std::cout<<"button 1 clicked!"<<std::endl;});
+	button1->setText(&HUDFont, "Breadth-First Search");
+	button1->setPosition(-999,-999);
+	button1->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::BFS);});
 	gameObjects.push_back(button1);
 
 	button2 = new Button(this);
-	button2->setText(&HUDFont, "Button 2");
-	button2->setPosition(100,200);
-	button2->setOnClick([](Game* game){std::cout<<"button 2 clicked!"<<std::endl;});
+	button2->setText(&HUDFont, "Uniform-Cost Search");
+	button2->setPosition(-999,-999);
+	button2->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::UCS);});
 	gameObjects.push_back(button2);
 
-	this->enterState(GameState::SETUP);
+	this->enterState(GameState::SET_POSITION);
 
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
 }
@@ -76,8 +76,8 @@ void Game::handleInput(sf::RenderWindow& window)
 		{
 			gameObject->handleInput(event, window, gameState);
 		}
-		
-		if (gameState == SETUP)
+
+		if (gameState == SET_POSITION)
 		{
 			if (event.type == sf::Event::MouseMoved)
 			{
@@ -102,13 +102,17 @@ void Game::handleInput(sf::RenderWindow& window)
 					robotPosition.x += rectPtr->getSize().x/2;
 					robotPosition.y += rectPtr->getSize().y/2;
 					robot->setPosition(robotPosition);
-					this->changeState(GameState::RUNNING);
+					this->changeState(GameState::SET_ALGORITHM);
 				}
 				else
 				{
 					// do nothing
 				}
 			}
+		}
+		else if (gameState == SET_ALGORITHM)
+		{
+			// no input events
 		}
 		else if (gameState == RUNNING)
 		{
@@ -148,7 +152,7 @@ void Game::changeState(GameState newGameState)
 
 void Game::enterState(GameState gameState)
 {
-	if (gameState == SETUP)
+	if (gameState == SET_POSITION)
 	{
 		indicator.setSize(sf::Vector2f(64, 64));
 		indicator.setFillColor(sf::Color::Transparent);
@@ -156,46 +160,67 @@ void Game::enterState(GameState gameState)
 		indicator.setOutlineThickness(5);
 		indicator.setPosition(-999,-999);
 	}
+	else if (gameState == SET_ALGORITHM)
+	{
+		button1->setPosition(200, 50);
+		button2->setPosition(500, 50);
+	}
 	else if (gameState == RUNNING)
 	{
-
+		textDisplay.setFont(HUDFont);
+		textDisplay.setCharacterSize(28);
+		textDisplay.setFillColor(sf::Color::White);
+		textDisplay.setOutlineColor(sf::Color::Black);
+		textDisplay.setOutlineThickness(2);
+		textDisplay.setPosition(0, 0);
+		if (this->algorithmType == AlgorithmType::BFS)
+		{
+			textDisplay.setString("RUNNING BFS");
+		}
+		if (this->algorithmType == AlgorithmType::UCS)
+		{
+			textDisplay.setString("RUNNING UCS");
+		}
 	}
 	else if (gameState == PAUSED)
 	{
-		pauseIndicator.setFont(HUDFont);
-		pauseIndicator.setCharacterSize(28);
-		pauseIndicator.setFillColor(sf::Color::White);
-		pauseIndicator.setOutlineColor(sf::Color::Black);
-		pauseIndicator.setOutlineThickness(2);
-		pauseIndicator.setString("SIMULATION PAUSED");
-		pauseIndicator.setPosition(0, 0);
+		textDisplay.setFont(HUDFont);
+		textDisplay.setCharacterSize(28);
+		textDisplay.setFillColor(sf::Color::White);
+		textDisplay.setOutlineColor(sf::Color::Black);
+		textDisplay.setOutlineThickness(2);
+		textDisplay.setString("SIMULATION PAUSED");
+		textDisplay.setPosition(0, 0);
 	}
 }
 
 void Game::exitState(GameState gameState)
 {
-	if (gameState == SETUP)
+	if (gameState == SET_POSITION)
 	{
 		indicator.setPosition(-999, -999);
 	}
+	else if (gameState == SET_ALGORITHM)
+	{
+		button1->setPosition(-999, -999);
+		button2->setPosition(-999, -999);
+	}
 	else if (gameState == RUNNING)
 	{
-
+		textDisplay.setPosition(-999, -999);
 	}
 	else if (gameState == PAUSED)
 	{
-		pauseIndicator.setPosition(-999, -999);
+		textDisplay.setPosition(-999, -999);
 	}
 }
-
-
 
 /**
 	Updates GameObjects, given that there has been deltaTime since the last update.
 **/
 void Game::update(sf::Time deltaTime)
 {
-	if (gameState == SETUP)
+	if (gameState == SET_POSITION)
 	{
 
 	}
@@ -225,16 +250,22 @@ void Game::draw(sf::RenderTarget& target)
 			gameSprite->draw(target, sf::RenderStates::Default);
 		}
 	}
-	if (gameState == SETUP)
+	if (gameState == SET_POSITION)
 	{
 		target.draw(indicator);
 	}
 	else if (gameState == RUNNING)
 	{
-
+		target.draw(textDisplay);
 	}
 	else if (gameState == PAUSED)
 	{
-		target.draw(pauseIndicator);
+		target.draw(textDisplay);
 	}
+}
+
+void Game::setAlgorithm(AlgorithmType algorithmType)
+{
+	this->algorithmType = algorithmType;
+	changeState(GameState::RUNNING);
 }

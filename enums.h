@@ -3,7 +3,12 @@
 
 enum GameState : int
 {
-	SETUP, RUNNING, PAUSED
+	SET_POSITION, SET_ALGORITHM, RUNNING, PAUSED
+};
+
+enum AlgorithmType : int
+{
+	BFS, UCS
 };
 
 #endif

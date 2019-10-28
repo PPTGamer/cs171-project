@@ -26,8 +26,10 @@ public:
 	void handleInput(sf::RenderWindow& window);
 	void update(sf::Time deltaTime);
 	void draw(sf::RenderTarget& target);
+	void setAlgorithm(AlgorithmType algorithmType);
 private:
 	GameState gameState;
+	AlgorithmType algorithmType;
 	void enterState(GameState gameState);
 	void exitState(GameState gameState);
 
@@ -40,7 +42,7 @@ private:
 	MazeDisplay* mazeDisplay;
 	Button *button1, *button2;
 	sf::RectangleShape indicator;
-	sf::Text pauseIndicator;
+	sf::Text textDisplay;
 
 	// Temporary, add to a font manager later
 	sf::Font HUDFont;

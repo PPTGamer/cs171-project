@@ -15,20 +15,27 @@ private:
 	sf::RectangleShape sprite;
 	sf::Text label;
 	Game* game;
+	bool engaged;
 	enum BUTTON_STATE {NORMAL, HOVER, CLICK};
 	void setState(BUTTON_STATE buttonState)
 	{
 		if (buttonState == NORMAL)
 		{
-			sprite.setFillColor(sf::Color(150,150,150));
+			sprite.setOutlineColor(sf::Color(255,255,255));
+			label.setFillColor(sf::Color(255,255,255));
+			label.setStyle(sf::Text::Bold);
 		}
 		else if (buttonState == HOVER)
 		{
-			sprite.setFillColor(sf::Color(150,150,200));
+			sprite.setOutlineColor(sf::Color(0,150,255));
+			label.setFillColor(sf::Color(0,150,255));
+			label.setStyle(sf::Text::Bold | sf::Text::Underlined);
 		}
 		else if (buttonState == CLICK)
 		{
-			sprite.setFillColor(sf::Color(200,150,150));
+			sprite.setOutlineColor(sf::Color(255,255,150));
+			label.setFillColor(sf::Color(255,255,150));
+			label.setStyle(sf::Text::Bold | sf::Text::Underlined);
 		}
 	}
 	void updateLabelPosition()
@@ -42,7 +49,9 @@ public:
 	Button(Game* game, std::string labelText = "") 
 	{
 		this->game = game;
-		sprite.setSize(sf::Vector2f(100,50));
+		sprite.setSize(sf::Vector2f(250,50));
+		sprite.setFillColor(sf::Color::Black);
+		sprite.setOutlineThickness(4);
 		setState(NORMAL);
 	}
 
@@ -52,16 +61,10 @@ public:
 	{
 		label.setFont(*font);
 		label.setString(labelText);
-		label.setCharacterSize(18);
-		label.setFillColor(sf::Color::Black);
+		label.setCharacterSize(20);
+		label.setStyle(sf::Text::Bold);
 		updateLabelPosition();
 	}
-	// void assignTextures(sf::Texture* normalTexture, sf::Texture* clickedTexture = NULL, sf::Texture* hoverTexture = NULL)
-	// {
-	// 	this->normalTexture = normalTexture;
-	// 	this->clickedTexture = clickedTexture;
-	// 	this->hoverTexture = hoverTexture;
-	// }
 	void setOnClick(std::function<void(Game*)> function)
 	{
 		onClick = function;
@@ -78,15 +81,14 @@ public:
 				{
 					// set clicked graphics
 					this->setState(CLICK);
-					if (onClick != nullptr)
-					{
-						onClick(game);
-					}
+					engaged = true;
 				}
 			}
+			else engaged = false;
 		}
 		else if (event.type == sf::Event::MouseMoved)
 		{
+			engaged = false;
 			if (sprite.getGlobalBounds().contains(event.mouseMove.x, event.mouseMove.y))
 			{
 				if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
@@ -103,8 +105,16 @@ public:
 		}
 		else if (event.type == sf::Event::MouseButtonReleased)
 		{
+			if (engaged)
+			{
+				if (onClick != nullptr)
+				{
+					onClick(game);
+				}
+			}
 			// set neutral graphics
 			this->setState(NORMAL);
+			engaged = false;
 		}
 	}
 	void update(sf::Time deltaTime) {}
