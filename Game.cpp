@@ -71,6 +71,36 @@ void Game::handleInput(sf::RenderWindow& window)
 			currView.setViewport(sf::FloatRect((w-usedWidth)/(2*w),0.0f,usedWidth/w,1.0f));
 			window.setView(currView);
 		}
+		if (event.type == sf::Event::MouseMoved)
+		{
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+			{
+				if (oldMouseX < 0 || oldMouseY < 0)
+				{
+					oldMouseX = event.mouseMove.x;
+					oldMouseY = event.mouseMove.y;
+				}
+				sf::View currView = window.getView();
+				currView.move(oldMouseX-event.mouseMove.x, oldMouseY-event.mouseMove.y);
+				currView.setCenter(
+					std::max(currView.getCenter().x, 400.0f-mazeDisplay->getSize().x/2),
+					std::max(currView.getCenter().y, 300.0f-mazeDisplay->getSize().y/2)
+				);
+				currView.setCenter(
+					std::min(currView.getCenter().x, 400.0f+mazeDisplay->getSize().x/2),
+					std::min(currView.getCenter().y, 300.0f+mazeDisplay->getSize().y/2)
+				);
+				window.setView(currView);
+				oldMouseX = event.mouseMove.x;
+				oldMouseY = event.mouseMove.y;
+			}
+		}
+		if (event.type == sf::Event::MouseButtonReleased)
+		{
+			oldMouseX = -1;
+			oldMouseY = -1;
+		}
+		viewPosition = sf::Vector2f(window.getView().getCenter().x - 400, window.getView().getCenter().y- 300);
 
 		for (auto&& gameObject : gameObjects)
 		{
@@ -92,7 +122,7 @@ void Game::handleInput(sf::RenderWindow& window)
 					indicator.setPosition(-999,-999);
 				}
 			}
-			if (event.type == sf::Event::MouseButtonPressed)
+			if (event.type == sf::Event::MouseButtonPressed && sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
 				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
@@ -162,8 +192,8 @@ void Game::enterState(GameState gameState)
 	}
 	else if (gameState == SET_ALGORITHM)
 	{
-		button1->setPosition(200, 50);
-		button2->setPosition(500, 50);
+		button1->setPosition(sf::Vector2f(200, 50) + viewPosition);
+		button2->setPosition(sf::Vector2f(500, 50) + viewPosition);
 	}
 	else if (gameState == RUNNING)
 	{
@@ -172,7 +202,7 @@ void Game::enterState(GameState gameState)
 		textDisplay.setFillColor(sf::Color::White);
 		textDisplay.setOutlineColor(sf::Color::Black);
 		textDisplay.setOutlineThickness(2);
-		textDisplay.setPosition(0, 0);
+		textDisplay.setPosition(viewPosition);
 		if (this->algorithmType == AlgorithmType::BFS)
 		{
 			textDisplay.setString("RUNNING BFS");
@@ -190,7 +220,7 @@ void Game::enterState(GameState gameState)
 		textDisplay.setOutlineColor(sf::Color::Black);
 		textDisplay.setOutlineThickness(2);
 		textDisplay.setString("SIMULATION PAUSED");
-		textDisplay.setPosition(0, 0);
+		textDisplay.setPosition(viewPosition);
 	}
 }
 
@@ -224,16 +254,22 @@ void Game::update(sf::Time deltaTime)
 	{
 
 	}
+	else if (gameState == SET_ALGORITHM)
+	{
+		button1->setPosition(sf::Vector2f(200, 50) + viewPosition);
+		button2->setPosition(sf::Vector2f(500, 50) + viewPosition);
+	}
 	else if (gameState == RUNNING)
 	{
 		for(auto&& gameObject : gameObjects)
 		{
 			gameObject->update(deltaTime);
 		}
+		textDisplay.setPosition(viewPosition);
 	}
 	else if (gameState == PAUSED)
 	{
-		
+		textDisplay.setPosition(viewPosition);
 	}
 	
 }

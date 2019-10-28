@@ -89,7 +89,9 @@ public:
 		else if (event.type == sf::Event::MouseMoved)
 		{
 			engaged = false;
-			if (sprite.getGlobalBounds().contains(event.mouseMove.x, event.mouseMove.y))
+			sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
+			sf::Vector2f worldCoordinates = window.mapPixelToCoords(pixelCoordinates);
+			if (sprite.getGlobalBounds().contains(worldCoordinates))
 			{
 				if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{

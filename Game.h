@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 // Standard libraries
+#include <cmath>
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -27,6 +28,8 @@ public:
 	void update(sf::Time deltaTime);
 	void draw(sf::RenderTarget& target);
 	void setAlgorithm(AlgorithmType algorithmType);
+	int oldMouseX = -1, oldMouseY = -1;
+	sf::Vector2f viewPosition;
 private:
 	GameState gameState;
 	AlgorithmType algorithmType;
