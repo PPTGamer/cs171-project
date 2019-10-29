@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include "AnimatedSprite.h"
 #include "../ai/Maze.h"
+#include "../managers/TextureManager.h"
 class MazeDisplay : public GameSprite
 {
 private:
@@ -13,6 +14,7 @@ private:
 	Maze maze;
 	sf::Texture* wallTexture;
 	sf::Texture* groundTexture;
+	sf::Texture* roughTexture;
 	sf::Font displayFont;
 	std::vector<std::vector<sf::RectangleShape>> tiles;
 	std::map<std::pair<int,int>, std::pair<sf::RectangleShape, sf::Text>> indicators;
@@ -40,7 +42,7 @@ private:
 						tiles[x][y].setFillColor(sf::Color::Red);
 					}
 				}
-				else
+				else if(maze(x,y) == Maze::EntryType::EMPTY)
 				{
 					if(groundTexture != NULL)
 					{
@@ -51,6 +53,19 @@ private:
 					else
 					{
 						tiles[x][y].setFillColor(sf::Color::White);
+					}
+				}
+				else if(maze(x,y) == Maze::EntryType::ROUGH)
+				{
+					if(roughTexture != NULL)
+					{
+						int numTiles = roughTexture->getSize().x / TILE_SIZE;
+						tiles[x][y].setTexture(roughTexture);
+						tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
+					}
+					else
+					{
+						tiles[x][y].setFillColor(sf::Color::Green);
 					}
 				}
 			}
@@ -68,11 +83,15 @@ private:
 		}
 	}
 public:
-	MazeDisplay(sf::Font font, sf::Texture* wallTexture = NULL, sf::Texture* groundTexture = NULL, Maze maze = Maze())
+	MazeDisplay(sf::Font font, TextureManager* textureManager)
 	{
+		textureManager->loadTexture("crate.png");
+		textureManager->loadTexture("floor.png");
+		textureManager->loadTexture("mudfloor.png");
 		this->maze = maze;
-		this->wallTexture = wallTexture;
-		this->groundTexture = groundTexture;
+		this->wallTexture = textureManager->getTexture("crate.png");
+		this->groundTexture = textureManager->getTexture("floor.png");
+		this->roughTexture = textureManager->getTexture("mudfloor.png");
 		this->displayFont = font;
 		refreshTiles();
 	}
