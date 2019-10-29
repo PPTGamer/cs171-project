@@ -13,7 +13,9 @@ Game::Game(): gameState(DEFAULT)
 	}
 
 	textureManager.loadTexture("crate.png");
-	mazeDisplay = new MazeDisplay(HUDFont, textureManager.getTexture("crate.png"));
+	Maze maze(4, 4);
+	maze.generate();
+	mazeDisplay = new MazeDisplay(HUDFont, textureManager.getTexture("crate.png"), NULL, maze);
 	gameObjects.push_back(mazeDisplay);
 	mazeDisplay->setPosition(sf::Vector2f(
 		400-mazeDisplay->getSize().x/2.0, 
