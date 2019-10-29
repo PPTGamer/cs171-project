@@ -15,7 +15,10 @@ Game::Game(): gameState(SET_POSITION)
 	Maze maze(4, 4);
 	maze.generate();
 	mazeDisplay = new MazeDisplay(HUDFont, &textureManager, maze);
-	gameObjects.push_back(mazeDisplay);
+	addGameObject(mazeDisplay, GameState::SET_POSITION);
+	addGameObject(mazeDisplay, GameState::SET_ALGORITHM);
+	addGameObject(mazeDisplay, GameState::RUNNING);
+	addGameObject(mazeDisplay, GameState::PAUSED);
 	mazeDisplay->setPosition(sf::Vector2f(
 		400-mazeDisplay->getSize().x/2.0, 
 		300-mazeDisplay->getSize().y/2.0
@@ -23,20 +26,19 @@ Game::Game(): gameState(SET_POSITION)
 	
 	textureManager.loadTexture("robotsprite.png");
 	robot = new Robot(textureManager.getTexture("robotsprite.png"));
-	robot->setPosition(-999,999);
-	gameObjects.push_back(robot);
+	addGameObject(robot, GameState::SET_ALGORITHM);
+	addGameObject(robot, GameState::RUNNING);
+	addGameObject(robot, GameState::PAUSED);
 
 	button1 = new Button(this);
 	button1->setText(&HUDFont, "Breadth-First Search");
-	button1->setPosition(-999,-999);
 	button1->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::BFS);});
-	gameObjects.push_back(button1);
+	addGameObject(button1, GameState::SET_ALGORITHM);
 
 	button2 = new Button(this);
 	button2->setText(&HUDFont, "Uniform-Cost Search");
-	button2->setPosition(-999,-999);
 	button2->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::UCS);});
-	gameObjects.push_back(button2);
+	addGameObject(button2, GameState::SET_ALGORITHM);
 
 	this->enterState(GameState::SET_POSITION);
 
@@ -47,7 +49,7 @@ Game::~Game()
 {
 	for (auto&& gameObjectPtr : gameObjects)
 	{
-		delete gameObjectPtr;
+		delete gameObjectPtr.first;
 	}
 }
 
@@ -105,7 +107,11 @@ void Game::handleInput(sf::RenderWindow& window)
 
 		for (auto&& gameObject : gameObjects)
 		{
-			gameObject->handleInput(event, window, gameState);
+			// if gameObject is part of the current state, handle input for it
+			if (gameObject.second.find(gameState) != gameObject.second.end())
+			{
+				gameObject.first->handleInput(event, window, gameState);
+			}
 		}
 
 		if (gameState == SET_POSITION)
@@ -116,11 +122,12 @@ void Game::handleInput(sf::RenderWindow& window)
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
 				if (rectPtr != NULL)
 				{
+					indicator.setOutlineColor(sf::Color::Red);
 					indicator.setPosition(rectPtr->getPosition());
 				}
 				else
 				{
-					indicator.setPosition(-999,-999);
+					indicator.setOutlineColor(sf::Color::Transparent);
 				}
 			}
 			if (event.type == sf::Event::MouseButtonPressed && sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -135,10 +142,6 @@ void Game::handleInput(sf::RenderWindow& window)
 					robot->setPosition(robotPosition);
 					this->changeState(GameState::SET_ALGORITHM);
 				}
-				else
-				{
-					// do nothing
-				}
 			}
 		}
 		else if (gameState == SET_ALGORITHM)
@@ -150,18 +153,6 @@ void Game::handleInput(sf::RenderWindow& window)
 			if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
 			{
 				this->changeState(GameState::PAUSED);
-			}
-			else if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
-			{
-				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-				sf::Vector2i tileCoordinates = mazeDisplay->getTileIndexAtPixel(window.mapPixelToCoords(pixelCoordinates));
-				mazeDisplay->setMark(tileCoordinates.x, tileCoordinates.y, sf::Color::Yellow, "test");
-			}
-			else if(sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
-			{
-				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-				sf::Vector2i tileCoordinates = mazeDisplay->getTileIndexAtPixel(window.mapPixelToCoords(pixelCoordinates));
-				mazeDisplay->clearMark(tileCoordinates.x, tileCoordinates.y);
 			}
 		}
 		else if (gameState == PAUSED)
@@ -187,9 +178,8 @@ void Game::enterState(GameState gameState)
 	{
 		indicator.setSize(sf::Vector2f(64, 64));
 		indicator.setFillColor(sf::Color::Transparent);
-		indicator.setOutlineColor(sf::Color::Red);
 		indicator.setOutlineThickness(5);
-		indicator.setPosition(-999,-999);
+		indicator.setOutlineColor(sf::Color::Transparent);
 	}
 	else if (gameState == SET_ALGORITHM)
 	{
@@ -225,32 +215,31 @@ void Game::enterState(GameState gameState)
 	}
 }
 
-void Game::exitState(GameState gameState)
+void Game::addGameObject(GameObject* gameObjectPtr, GameState gameState)
 {
-	if (gameState == SET_POSITION)
-	{
-		indicator.setPosition(-999, -999);
-	}
-	else if (gameState == SET_ALGORITHM)
-	{
-		button1->setPosition(-999, -999);
-		button2->setPosition(-999, -999);
-	}
-	else if (gameState == RUNNING)
-	{
-		textDisplay.setPosition(-999, -999);
-	}
-	else if (gameState == PAUSED)
-	{
-		textDisplay.setPosition(-999, -999);
-	}
+	this->gameObjects[gameObjectPtr].insert(gameState);
 }
+
+void Game::addHUDObject(sf::Drawable* drawablePtr)
+{
+	this->HUDObjects.push_back(drawablePtr);
+}
+
+void Game::exitState(GameState gameState) {}
 
 /**
 	Updates GameObjects, given that there has been deltaTime since the last update.
 **/
 void Game::update(sf::Time deltaTime)
 {
+	for(auto&& gameObject : gameObjects)
+	{
+		// if gameObject is part of the current state, update it
+		if (gameObject.second.find(gameState) != gameObject.second.end())
+		{
+			gameObject.first->update(deltaTime);
+		}
+	}
 	if (gameState == SET_POSITION)
 	{
 
@@ -262,10 +251,7 @@ void Game::update(sf::Time deltaTime)
 	}
 	else if (gameState == RUNNING)
 	{
-		for(auto&& gameObject : gameObjects)
-		{
-			gameObject->update(deltaTime);
-		}
+
 		textDisplay.setPosition(viewPosition);
 	}
 	else if (gameState == PAUSED)
@@ -280,11 +266,15 @@ void Game::update(sf::Time deltaTime)
 **/
 void Game::draw(sf::RenderTarget& target)
 {
-	for(auto const &gameObjectPtr : gameObjects)
+	for(auto const &gameObject : gameObjects)
 	{
-		if (GameSprite* gameSprite = dynamic_cast<GameSprite*>(gameObjectPtr))
+		// if gameObject is part of the current state, and is castable to a GameSprite, draw it
+		if (gameObject.second.find(gameState) != gameObject.second.end())
 		{
-			gameSprite->draw(target, sf::RenderStates::Default);
+			if (GameSprite* gameSprite = dynamic_cast<GameSprite*>(gameObject.first))
+			{
+				gameSprite->draw(target, sf::RenderStates::Default);
+			}
 		}
 	}
 	if (gameState == SET_POSITION)

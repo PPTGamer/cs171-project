@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <map>
+#include <set>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
@@ -35,12 +37,14 @@ private:
 	AlgorithmType algorithmType;
 	void enterState(GameState gameState);
 	void exitState(GameState gameState);
-
+	void addGameObject(GameObject* gameObjectPtr, GameState gameState);
+	void addHUDObject(sf::Drawable* drawablePtr);
 	// Resource managers
 	TextureManager textureManager;
 
 	// Game objects
-	std::vector<GameObject*> gameObjects;
+	std::map<GameObject*, std::set<GameState>> gameObjects;
+	std::vector<sf::Drawable*> HUDObjects;
 	Robot* robot;
 	MazeDisplay* mazeDisplay;
 	Button *button1, *button2;
