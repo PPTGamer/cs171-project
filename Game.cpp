@@ -11,7 +11,9 @@ Game::Game(): gameState(SET_POSITION)
 	{
 		std::cout<<"Unable to load font!"<<std::endl;
 	}
-	Maze maze = Maze();
+	
+	Maze maze(4, 4);
+	maze.generate();
 	mazeDisplay = new MazeDisplay(HUDFont, &textureManager, maze);
 	gameObjects.push_back(mazeDisplay);
 	mazeDisplay->setPosition(sf::Vector2f(
