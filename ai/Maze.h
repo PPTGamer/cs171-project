@@ -5,7 +5,10 @@
 #include <random>
 #include <vector>
 #include <deque>
-
+/*
+ * Usage: Maze maze(width, height)
+ * maze.generate() to do the thing
+ */
 class Maze
 {
 private:
@@ -14,7 +17,7 @@ private:
 	int width;
 	int startx, starty;
 public:
-	enum EntryType {EMPTY, WALL, START, END};
+	enum EntryType {EMPTY, WALL, START, END, KEY};
 	enum DirectionType {NORTH, WEST, SOUTH, EAST};
 	sf::Vector2i getSize() const { return sf::Vector2i(width, height); }
 	/*
@@ -49,6 +52,7 @@ public:
 			}
 		}
 		randomDFS();
+		randomKeys();
 		printMaze();
 	}
 private:
@@ -71,8 +75,8 @@ private:
 		std::deque<std::pair<int, int>> fringe;
 		std::pair<int, int> generated_startpos = gen_start();
 		this->startx = generated_startpos.first; this->starty = generated_startpos.second;
-		
-		v[starty][startx] = EMPTY;
+
+		v[starty][startx] = START;
 		fringe.push_back({startx, starty});
 		std:: cout << "starting coordinates: " << this->startx << ' ' << this->starty << std::endl;
 		while(not fringe.empty()){
@@ -93,13 +97,39 @@ private:
 			}
 		}
 	}
+
+	void randomKeys(){
+		int empty = 0;
+		for (int i = 0; i < height; ++i)
+			for (int j = 0; j < width; ++j)
+				if (v[i][j] == EMPTY)
+					empty++;
+
+		std::random_device dev;
+		std::mt19937 rng(dev());
+		std::uniform_int_distribution<std::mt19937::result_type> dist_keys(1, empty / 5); // There are at most 20% of empty cells as cells with keys
+		std::uniform_int_distribution<std::mt19937::result_type> dist_width(1, width - 2);
+		std::uniform_int_distribution<std::mt19937::result_type> dist_height(1, height - 2);
+
+		int number_of_keys = dist_keys(rng);
+		std::cout << "Generating " << number_of_keys << " keys" << std::endl;
+		while(number_of_keys > 0){
+			int randx = dist_width(rng), randy = dist_height(rng);
+			if (v[randx][randy] == EMPTY){
+				this->v[randx][randy] = KEY;
+				--number_of_keys;
+			}
+		}
+
+	}
+
 	void printMaze(){
 		for (auto row : v){
 			for (int cell : row){
 				if (cell == WALL)
 					std::cout << '#';
 				else
-					std::cout << ' ';
+					std::cout << cell;
 			}
 			std::cout << std::endl;
 		}
