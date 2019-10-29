@@ -83,7 +83,7 @@ private:
 		}
 	}
 public:
-	MazeDisplay(sf::Font font, TextureManager* textureManager)
+	MazeDisplay(sf::Font font, TextureManager* textureManager, Maze maze)
 	{
 		textureManager->loadTexture("crate.png");
 		textureManager->loadTexture("floor.png");
