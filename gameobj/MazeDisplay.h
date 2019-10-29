@@ -12,14 +12,18 @@ private:
 	const int TILE_SIZE = 64;
 	sf::Vector2f position;
 	Maze maze;
+	TextureManager* textureManager;
 	sf::Texture* wallTexture;
 	sf::Texture* groundTexture;
 	sf::Texture* roughTexture;
 	sf::Font displayFont;
 	std::vector<std::vector<sf::RectangleShape>> tiles;
+	std::map<std::pair<int,int>, AnimatedSprite> sprites;
+	sf::Time spriteTime;
 	std::map<std::pair<int,int>, std::pair<sf::RectangleShape, sf::Text>> indicators;
 	void refreshTiles()
 	{
+		sprites.clear();
 		sf::Vector2i mazeSize = maze.getSize();
 		tiles.resize(mazeSize.x);
 		for(int x = 0; x < mazeSize.x; x++)
@@ -42,19 +46,6 @@ private:
 						tiles[x][y].setFillColor(sf::Color::Red);
 					}
 				}
-				else if(maze(x,y) == Maze::EntryType::EMPTY)
-				{
-					if(groundTexture != NULL)
-					{
-						int numTiles = groundTexture->getSize().x / TILE_SIZE;
-						tiles[x][y].setTexture(groundTexture);
-						tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
-					}
-					else
-					{
-						tiles[x][y].setFillColor(sf::Color::White);
-					}
-				}
 				else if(maze(x,y) == Maze::EntryType::ROUGH)
 				{
 					if(roughTexture != NULL)
@@ -68,6 +59,38 @@ private:
 						tiles[x][y].setFillColor(sf::Color::Green);
 					}
 				}
+				else
+				{
+					if(groundTexture != NULL)
+					{
+						int numTiles = groundTexture->getSize().x / TILE_SIZE;
+						tiles[x][y].setTexture(groundTexture);
+						tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
+					}
+					else
+					{
+						tiles[x][y].setFillColor(sf::Color::White);
+					}
+				}
+
+				if (maze(x,y) == Maze::EntryType::KEY)
+				{
+					AnimatedSprite sprite;
+					sprite.setPosition(sf::Vector2f(x*TILE_SIZE,y*TILE_SIZE) + position);
+					sprite.setTexture(*textureManager->getTexture("keycard.png"));
+					sprite.setAnimationLength(16);
+					sprite.setAnimationNumber(rand()%3);
+					sprites[{x,y}] = sprite;
+				}
+				else if (maze(x,y) == Maze::EntryType::END)
+				{
+					AnimatedSprite sprite;
+					sprite.setPosition(sf::Vector2f(x*TILE_SIZE,y*TILE_SIZE) + position);
+					sprite.setTexture(*textureManager->getTexture("gate.png"));
+					sprite.setAnimationLength(1);
+					sprite.setAnimationNumber(0);
+					sprites[{x,y}] = sprite;
+				}
 			}
 		}
 	}
@@ -79,6 +102,10 @@ private:
 			for(int y = 0; y < mazeSize.y; y++)
 			{
 				tiles[x][y].setPosition(sf::Vector2f(x*TILE_SIZE,y*TILE_SIZE) + position);
+				if (maze(x,y) == Maze::EntryType::KEY || maze(x,y)== Maze::EntryType::END)
+				{
+					sprites[{x,y}].setPosition(sf::Vector2f(x*TILE_SIZE,y*TILE_SIZE) + position);
+				}
 			}
 		}
 	}
@@ -88,6 +115,9 @@ public:
 		textureManager->loadTexture("crate.png");
 		textureManager->loadTexture("floor.png");
 		textureManager->loadTexture("mudfloor.png");
+		textureManager->loadTexture("keycard.png");
+		textureManager->loadTexture("gate.png");
+		this->textureManager = textureManager;
 		this->maze = maze;
 		this->wallTexture = textureManager->getTexture("crate.png");
 		this->groundTexture = textureManager->getTexture("floor.png");
@@ -158,7 +188,21 @@ public:
 		repositionTiles();
 	}
 	sf::Vector2f getPosition() {return position;}
-	void update(sf::Time deltaTime) {}
+	void update(sf::Time deltaTime) 
+	{
+		sf::Time timePerFrame = sf::milliseconds(120);
+		spriteTime += deltaTime;
+		
+		while(spriteTime >= timePerFrame)
+		{
+			for (auto&& sprite : sprites)
+			{
+				sprite.second.advanceFrame(1);
+			}
+			spriteTime -= timePerFrame;
+		}
+		
+	}
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
 	{
 		sf::Vector2i mazeSize = maze.getSize();
@@ -168,6 +212,10 @@ public:
 			{
 				target.draw(tiles[x][y], states);
 			}
+		}
+		for (auto&& sprite : sprites)
+		{
+			target.draw(sprite.second);
 		}
 		for(auto&& indicator : indicators)
 		{
