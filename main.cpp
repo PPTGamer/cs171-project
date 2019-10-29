@@ -26,7 +26,7 @@ int main()
 		}
 		
 		//draw
-		window.clear(sf::Color(0,0,50,255));
+		window.clear(sf::Color::Black);
 		game->draw(window);
 		window.display();
     }
