@@ -143,9 +143,16 @@ void Game::handleInput(sf::RenderWindow& window)
 			{
 				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
-				if (rectPtr != NULL && mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates)) == Maze::EntryType::EMPTY)
+				if (rectPtr != NULL)
 				{
-					indicator.setColor(sf::Color(255,255,255,100));
+					if (mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates)) == Maze::EntryType::EMPTY)
+					{
+						indicator.setColor(sf::Color(255,255,255,100));
+					}
+					else
+					{
+						indicator.setColor(sf::Color(255,0,0,100));
+					}
 					indicator.setPosition(rectPtr->getPosition());
 				}
 				else
@@ -157,7 +164,7 @@ void Game::handleInput(sf::RenderWindow& window)
 			{
 				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
-				if (rectPtr != NULL)
+				if (rectPtr != NULL && mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates)) == Maze::EntryType::EMPTY)
 				{
 					sf::Vector2f robotPosition = rectPtr->getPosition();
 					robotPosition.x += rectPtr->getSize().x/2;
