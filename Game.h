@@ -53,7 +53,7 @@ private:
 	std::map<int, std::vector<sf::Drawable*>> drawableMap;
 	Robot* robot;
 	MazeDisplay* mazeDisplay;
-	sf::RectangleShape indicator;
+	sf::Sprite indicator;
 	sf::Text textDisplay;
 
 	// Temporary, add to a font manager later
