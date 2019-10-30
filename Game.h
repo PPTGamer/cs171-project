@@ -30,7 +30,6 @@ public:
 	void update(sf::Time deltaTime);
 	void draw(sf::RenderTarget& target);
 	void setAlgorithm(AlgorithmType algorithmType);
-	int oldMouseX = -1, oldMouseY = -1;
 private:
 	GameState gameState;
 	AlgorithmType algorithmType;
@@ -38,6 +37,9 @@ private:
 	void exitState(GameState gameState);
 	void addGameObject(GameObject* gameObjectPtr, GameState gameState, int layer = 1);
 
+	// Input handling
+	int oldMouseX = -1, oldMouseY = -1;
+	
 	// Views
 	static const int NUM_LAYERS = 3;
 	sf::View layerView[NUM_LAYERS];
@@ -51,7 +53,6 @@ private:
 	std::map<int, std::vector<sf::Drawable*>> drawableMap;
 	Robot* robot;
 	MazeDisplay* mazeDisplay;
-	Button *button1, *button2;
 	sf::RectangleShape indicator;
 	sf::Text textDisplay;
 

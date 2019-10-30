@@ -13,9 +13,7 @@ private:
 	sf::Vector2f position;
 	Maze maze;
 	TextureManager* textureManager;
-	sf::Texture* wallTexture;
-	sf::Texture* groundTexture;
-	sf::Texture* roughTexture;
+	std::unordered_map<Maze::EntryType, sf::Texture*> textureMap;
 	sf::Font displayFont;
 	std::vector<std::vector<sf::RectangleShape>> tiles;
 	std::map<std::pair<int,int>, AnimatedSprite> sprites;
@@ -33,44 +31,16 @@ private:
 			{
 				tiles[x][y].setSize(sf::Vector2f(TILE_SIZE,TILE_SIZE));
 				tiles[x][y].setPosition(sf::Vector2f(x*TILE_SIZE,y*TILE_SIZE) + position);
-				if(maze(x,y) == Maze::EntryType::WALL)
+
+				if(textureMap.find(maze(x,y)) != textureMap.end())
 				{
-					if(wallTexture != NULL)
-					{
-						int numTiles = wallTexture->getSize().x / TILE_SIZE;
-						tiles[x][y].setTexture(wallTexture);
-						tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
-					}
-					else
-					{
-						tiles[x][y].setFillColor(sf::Color::Red);
-					}
-				}
-				else if(maze(x,y) == Maze::EntryType::ROUGH)
-				{
-					if(roughTexture != NULL)
-					{
-						int numTiles = roughTexture->getSize().x / TILE_SIZE;
-						tiles[x][y].setTexture(roughTexture);
-						tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
-					}
-					else
-					{
-						tiles[x][y].setFillColor(sf::Color::Green);
-					}
+					int numTiles = textureMap[maze(x,y)]->getSize().x / TILE_SIZE;
+					tiles[x][y].setTexture(textureMap[maze(x,y)]);
+					tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
 				}
 				else
 				{
-					if(groundTexture != NULL)
-					{
-						int numTiles = groundTexture->getSize().x / TILE_SIZE;
-						tiles[x][y].setTexture(groundTexture);
-						tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
-					}
-					else
-					{
-						tiles[x][y].setFillColor(sf::Color::White);
-					}
+					tiles[x][y].setFillColor(sf::Color::Red);
 				}
 
 				if (maze(x,y) == Maze::EntryType::KEY)
@@ -119,12 +89,18 @@ public:
 		textureManager->loadTexture("gate.png");
 		this->textureManager = textureManager;
 		this->maze = maze;
-		this->wallTexture = textureManager->getTexture("crate.png");
-		this->groundTexture = textureManager->getTexture("floor.png");
-		this->roughTexture = textureManager->getTexture("mudfloor.png");
+		this->textureMap[Maze::EntryType::WALL] = textureManager->getTexture("crate.png");
+		this->textureMap[Maze::EntryType::EMPTY] = textureManager->getTexture("floor.png");
+		this->textureMap[Maze::EntryType::KEY] = textureManager->getTexture("floor.png");
+		this->textureMap[Maze::EntryType::START] = textureManager->getTexture("floor.png");
+		this->textureMap[Maze::EntryType::END] = textureManager->getTexture("floor.png");
+		this->textureMap[Maze::EntryType::ROUGH] = textureManager->getTexture("mudfloor.png");
 		this->displayFont = font;
 		refreshTiles();
 	}
+	/*
+		Get size of maze display, in pixels.
+	*/
 	sf::Vector2i getSize()
 	{
 		sf::Vector2i mazeSize = maze.getSize();

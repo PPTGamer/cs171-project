@@ -33,20 +33,36 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	addGameObject(robot, GameState::RUNNING);
 	addGameObject(robot, GameState::PAUSED);
 
-	button1 = new Button(this);
-	button1->setPosition(sf::Vector2f(200, 50));
+	Button* button1 = new Button(this);
+	button1->setPosition(sf::Vector2f(50, 100));
 	button1->setText(&HUDFont, "Breadth-First Search");
 	button1->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::BFS);});
 	addGameObject(button1, GameState::SET_ALGORITHM, 0);
 		
-	button2 = new Button(this);
-	button2->setPosition(sf::Vector2f(500, 50));
+	Button* button2 = new Button(this);
+	button2->setPosition(sf::Vector2f(50, 250));
 	button2->setText(&HUDFont, "Uniform-Cost Search");
 	button2->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::UCS);});
 	addGameObject(button2, GameState::SET_ALGORITHM, 0);
 
-	this->enterState(GameState::SET_POSITION);
+	Button* button3 = new Button(this);
+	button3->setPosition(sf::Vector2f(50, 400));
+	button3->setText(&HUDFont, "informed search\n(not implemented yet)");
+	button3->setOnClick([](Game* game){});
+	addGameObject(button3, GameState::SET_ALGORITHM, 0);
 
+	textDisplay.setFont(HUDFont);
+	textDisplay.setCharacterSize(28);
+	textDisplay.setFillColor(sf::Color::White);
+	textDisplay.setOutlineColor(sf::Color::Black);
+	textDisplay.setOutlineThickness(2);
+
+	indicator.setSize(sf::Vector2f(64, 64));
+	indicator.setFillColor(sf::Color::Transparent);
+	indicator.setOutlineThickness(5);
+
+	this->enterState(GameState::SET_POSITION);
+	
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
 }
 
@@ -80,7 +96,7 @@ void Game::handleInput(sf::RenderWindow& window)
 				layerView[i].setViewport(sf::FloatRect((w-usedWidth)/(2*w),0.0f,usedWidth/w,1.0f));
 			}
 		}
-		if (event.type == sf::Event::MouseMoved)
+		if (event.type == sf::Event::MouseMoved) // drag to scroll layer 1
 		{
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 			{
@@ -184,18 +200,10 @@ void Game::enterState(GameState gameState)
 {
 	if (gameState == SET_POSITION)
 	{
-		indicator.setSize(sf::Vector2f(64, 64));
-		indicator.setFillColor(sf::Color::Transparent);
-		indicator.setOutlineThickness(5);
 		indicator.setOutlineColor(sf::Color::Transparent);
 	}
 	else if (gameState == RUNNING)
 	{
-		textDisplay.setFont(HUDFont);
-		textDisplay.setCharacterSize(28);
-		textDisplay.setFillColor(sf::Color::White);
-		textDisplay.setOutlineColor(sf::Color::Black);
-		textDisplay.setOutlineThickness(2);
 		if (this->algorithmType == AlgorithmType::BFS)
 		{
 			textDisplay.setString("RUNNING BFS");
@@ -207,11 +215,6 @@ void Game::enterState(GameState gameState)
 	}
 	else if (gameState == PAUSED)
 	{
-		textDisplay.setFont(HUDFont);
-		textDisplay.setCharacterSize(28);
-		textDisplay.setFillColor(sf::Color::White);
-		textDisplay.setOutlineColor(sf::Color::Black);
-		textDisplay.setOutlineThickness(2);
 		textDisplay.setString("SIMULATION PAUSED");
 	}
 }
