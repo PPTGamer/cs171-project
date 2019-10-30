@@ -57,9 +57,9 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	textDisplay.setOutlineColor(sf::Color::Black);
 	textDisplay.setOutlineThickness(2);
 
-	indicator.setSize(sf::Vector2f(64, 64));
-	indicator.setFillColor(sf::Color::Transparent);
-	indicator.setOutlineThickness(5);
+	indicator.setColor(sf::Color::Transparent);
+	indicator.setTexture(*textureManager.getTexture("robotsprite.png"));
+	indicator.setTextureRect(sf::IntRect(0,0,64,64));
 
 	this->enterState(GameState::SET_POSITION);
 	
@@ -146,12 +146,12 @@ void Game::handleInput(sf::RenderWindow& window)
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
 				if (rectPtr != NULL)
 				{
-					indicator.setOutlineColor(sf::Color::Red);
+					indicator.setColor(sf::Color(255,255,255,100));
 					indicator.setPosition(rectPtr->getPosition());
 				}
 				else
 				{
-					indicator.setOutlineColor(sf::Color::Transparent);
+					indicator.setColor(sf::Color::Transparent);
 				}
 			}
 			if (event.type == sf::Event::MouseButtonPressed && sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -200,7 +200,7 @@ void Game::enterState(GameState gameState)
 {
 	if (gameState == SET_POSITION)
 	{
-		indicator.setOutlineColor(sf::Color::Transparent);
+		indicator.setColor(sf::Color::Transparent);
 	}
 	else if (gameState == RUNNING)
 	{
