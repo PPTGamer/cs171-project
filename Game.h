@@ -23,7 +23,7 @@
 class Game
 {
 public:
-	Game();
+	Game(sf::RenderWindow& window);
 	~Game();
 	void changeState(GameState newGameState);
 	void handleInput(sf::RenderWindow& window);
@@ -31,20 +31,24 @@ public:
 	void draw(sf::RenderTarget& target);
 	void setAlgorithm(AlgorithmType algorithmType);
 	int oldMouseX = -1, oldMouseY = -1;
-	sf::Vector2f viewPosition;
 private:
 	GameState gameState;
 	AlgorithmType algorithmType;
 	void enterState(GameState gameState);
 	void exitState(GameState gameState);
-	void addGameObject(GameObject* gameObjectPtr, GameState gameState);
-	void addHUDObject(sf::Drawable* drawablePtr);
+	void addGameObject(GameObject* gameObjectPtr, GameState gameState, int layer = 1);
+
+	// Views
+	static const int NUM_LAYERS = 3;
+	sf::View layerView[NUM_LAYERS];
+
 	// Resource managers
 	TextureManager textureManager;
 
 	// Game objects
 	std::map<GameObject*, std::set<GameState>> gameObjects;
-	std::vector<sf::Drawable*> HUDObjects;
+	std::map<int, std::vector<GameObject*>> layerMap;
+	std::map<int, std::vector<sf::Drawable*>> drawableMap;
 	Robot* robot;
 	MazeDisplay* mazeDisplay;
 	Button *button1, *button2;
