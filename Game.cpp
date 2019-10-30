@@ -29,7 +29,6 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	
 	textureManager.loadTexture("robotsprite.png");
 	robot = new Robot(textureManager.getTexture("robotsprite.png"));
-	addGameObject(robot, GameState::SET_ALGORITHM);
 	addGameObject(robot, GameState::RUNNING);
 	addGameObject(robot, GameState::PAUSED);
 
@@ -61,7 +60,7 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	indicator.setFillColor(sf::Color::Transparent);
 	indicator.setOutlineThickness(5);
 
-	this->enterState(GameState::SET_POSITION);
+	this->changeState(GameState::SET_ALGORITHM);
 	
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
 }
@@ -144,7 +143,7 @@ void Game::handleInput(sf::RenderWindow& window)
 			{
 				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
-				if (rectPtr != NULL)
+				if (rectPtr != NULL && mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates)) == Maze::EntryType::EMPTY)
 				{
 					indicator.setOutlineColor(sf::Color::Red);
 					indicator.setPosition(rectPtr->getPosition());
@@ -164,7 +163,7 @@ void Game::handleInput(sf::RenderWindow& window)
 					robotPosition.x += rectPtr->getSize().x/2;
 					robotPosition.y += rectPtr->getSize().y/2;
 					robot->setPosition(robotPosition);
-					this->changeState(GameState::SET_ALGORITHM);
+					this->changeState(GameState::RUNNING);
 				}
 			}
 		}
@@ -273,5 +272,5 @@ void Game::draw(sf::RenderTarget& target)
 void Game::setAlgorithm(AlgorithmType algorithmType)
 {
 	this->algorithmType = algorithmType;
-	changeState(GameState::RUNNING);
+	changeState(GameState::SET_POSITION);
 }
