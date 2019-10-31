@@ -15,7 +15,12 @@ private:
 	std::vector< std::vector<int> > v;
 	int height;
 	int width;
+<<<<<<< Updated upstream
 	int startx, starty;
+=======
+	sf::Vector2i start;
+	sf::Vector2i end;
+>>>>>>> Stashed changes
 public:
 	enum EntryType {EMPTY, WALL, START, END, KEY};
 	enum DirectionType {NORTH, WEST, SOUTH, EAST};
@@ -45,6 +50,10 @@ public:
 			this->v[i].resize(width);
 		}
 	}
+	void setStartingPoint(const sf::Vector2i& loc){
+		this->star = loc;
+		this->v[loc.y][loc.x] = START;
+	}
 	void generate(){
 		for (int i = 0; i < height; i++){
 			for (int j = 0; j < width; j++){
@@ -69,24 +78,42 @@ private:
 		
 	}
 
+<<<<<<< Updated upstream
 	void randomDFS(){
 		int dx[4] = {0, -1, 0, 1};
 		int dy[4] = {-1, 0, 1, 0};
 		std::deque<std::pair<int, int>> fringe;
 		std::pair<int, int> generated_startpos = gen_start();
 		this->startx = generated_startpos.first; this->starty = generated_startpos.second;
+=======
+	sf::Vector2i gen_cell(){
+		std::random_device dev;
+		std::mt19937 rng(dev());
+		std::uniform_int_distribution<std::mt19937::result_type> dist_width(1, width - 2);
+		std::uniform_int_distribution<std::mt19937::result_type> dist_height(1, height - 2);
+		int randx = (int)dist_width(rng), (int)randy = dist_height(rng);
+		return {randx, randy};
+	}
+
+	void randomDFS(){
+		int dx[4] = {0, -1, 0, 1};
+		int dy[4] = {-1, 0, 1, 0};
+		std::deque<sf::Vector2i> fringe;
+		sf::Vector2i generated_startpos = gen_start();
+		this->start = generated_startpos;
+>>>>>>> Stashed changes
 
 		v[starty][startx] = START;
 		fringe.push_back({startx, starty});
 		std:: cout << "starting coordinates: " << this->startx << ' ' << this->starty << std::endl;
 		while(not fringe.empty()){
-			int x = fringe.back().first;
-			int y = fringe.back().second; fringe.pop_back();
+			int cx = fringe.back().x;
+			int cy = fringe.back().y; fringe.pop_back();
 			DirectionType order[4] = {NORTH,WEST,SOUTH,EAST};
 			std::random_shuffle(order, order + 4);
 			for (int i = 0; i < 4; ++i){
-				int px = x + dx[order[i]];
-				int py = y + dy[order[i]];
+				int px = cx + dx[order[i]];
+				int py = cy + dy[order[i]];
 				int nx = px + dx[order[i]];
 				int ny = py + dy[order[i]];
 				if (out_of_bounds(nx, ny)) continue;
@@ -121,6 +148,24 @@ private:
 			}
 		}
 
+<<<<<<< Updated upstream
+=======
+	EntryType chooseTerrain(){
+		std::random_device dev;
+		std::mt19937 rng(dev());
+		std::uniform_int_distribution<std::mt19937::result_type> dist_terrain(0, 4); //20% chance that an "EMPTY" cell will be "ROCKY"
+		if (dist_terrain(rng) < 4) return EMPTY;
+		return ROCKY;
+	}
+
+	void randomEnd(){
+		auto endCandidate = this->gen_cell();
+		while(v[endCandidate.x][endCandidate.y] == KEY){
+			endCandidate = this->gen_cell();
+		}
+		this->end = endCandidate;
+		v[endCandidate.x][endCandidate.y] = END;
+>>>>>>> Stashed changes
 	}
 
 	void printMaze(){
@@ -128,6 +173,8 @@ private:
 			for (int cell : row){
 				if (cell == WALL)
 					std::cout << '#';
+				else if (cell == EMPTY)
+					std::cout << '.';
 				else
 					std::cout << cell;
 			}
