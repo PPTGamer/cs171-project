@@ -18,7 +18,7 @@ private:
 	sf::Vector2i start;
 	sf::Vector2i end;
 public:
-	enum EntryType {EMPTY, WALL, START, END, KEY};
+	enum EntryType {EMPTY, WALL, START, END, KEY, ROCKY};
 	enum DirectionType {NORTH, WEST, SOUTH, EAST};
 	sf::Vector2i getSize() const { return sf::Vector2i(width, height); }
 	/*
@@ -34,8 +34,7 @@ public:
 			};
 		this->height = 3;
 		this->width = 5;
-		this->startx = 1;
-		this->starty = 0;
+		this->start = {1, 0};
 	};
 	Maze(int w, int h)
 	{
@@ -47,8 +46,14 @@ public:
 		}
 	}
 	void setStartingPoint(const sf::Vector2i& loc){
-		this->star = loc;
+		this->start = loc;
 		this->v[loc.y][loc.x] = START;
+	}
+	sf::Vector2i getStart(){
+		return this->start;
+	}
+	bool out_of_bounds(int x, int y){
+		return x <= 0 or x >= width - 1 or y <= 0 or y >= height - 1;
 	}
 	void generate(){
 		for (int i = 0; i < height; i++){
@@ -58,41 +63,35 @@ public:
 		}
 		randomDFS();
 		randomKeys();
+		randomEnd();
 		printMaze();
 	}
 private:
-	bool out_of_bounds(int x, int y){
-		return x <= 0 or x >= width - 1 or y <= 0 or y >= height - 1;
-	}
-
-	std::pair<int, int> gen_start(){
+	sf::Vector2i gen_start(){
 		std::random_device dev;
 		std::mt19937 rng(dev());
 		std::uniform_int_distribution<std::mt19937::result_type> dist_width(0, (width - 3) / 2);
 		std::uniform_int_distribution<std::mt19937::result_type> dist_height(0, (height - 3) / 2);
-		return {2 * dist_width(rng) + 1, 2 * dist_height(rng) + 1};
+		return sf::Vector2i(2 * dist_width(rng) + 1, 2 * dist_height(rng) + 1);
 		
 	}
-
 	sf::Vector2i gen_cell(){
 		std::random_device dev;
 		std::mt19937 rng(dev());
 		std::uniform_int_distribution<std::mt19937::result_type> dist_width(1, width - 2);
 		std::uniform_int_distribution<std::mt19937::result_type> dist_height(1, height - 2);
-		int randx = (int)dist_width(rng), (int)randy = dist_height(rng);
-		return {randx, randy};
+		int randx = (int)dist_width(rng), randy = (int)dist_height(rng);
+		return sf::Vector2i(randx, randy);
 	}
-
 	void randomDFS(){
 		int dx[4] = {0, -1, 0, 1};
 		int dy[4] = {-1, 0, 1, 0};
 		std::deque<sf::Vector2i> fringe;
 		sf::Vector2i generated_startpos = gen_start();
 		this->start = generated_startpos;
-
-		v[starty][startx] = START;
-		fringe.push_back({startx, starty});
-		std:: cout << "starting coordinates: " << this->startx << ' ' << this->starty << std::endl;
+		v[this->start.y][this->start.x] = START;
+		fringe.push_back(this->start);
+		std::cout << "starting coordinates: " << this->start.x << ' ' << this->start.y << std::endl;
 		while(not fringe.empty()){
 			int cx = fringe.back().x;
 			int cy = fringe.back().y; fringe.pop_back();
@@ -106,12 +105,11 @@ private:
 				if (out_of_bounds(nx, ny)) continue;
 				if (v[ny][nx] == WALL){
 					v[py][px] = v[ny][nx] = EMPTY;
-					fringe.push_back({nx, ny});
+					fringe.push_back(sf::Vector2i(nx, ny));
 				}
 			}
 		}
 	}
-
 	void randomKeys(){
 		int empty = 0;
 		for (int i = 0; i < height; ++i)
@@ -134,7 +132,7 @@ private:
 				--number_of_keys;
 			}
 		}
-
+	}
 	EntryType chooseTerrain(){
 		std::random_device dev;
 		std::mt19937 rng(dev());
@@ -142,7 +140,6 @@ private:
 		if (dist_terrain(rng) < 4) return EMPTY;
 		return ROCKY;
 	}
-
 	void randomEnd(){
 		auto endCandidate = this->gen_cell();
 		while(v[endCandidate.x][endCandidate.y] == KEY){
@@ -151,7 +148,6 @@ private:
 		this->end = endCandidate;
 		v[endCandidate.x][endCandidate.y] = END;
 	}
-
 	void printMaze(){
 		for (auto row : v){
 			for (int cell : row){
