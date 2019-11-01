@@ -62,6 +62,15 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	indicator.setTexture(*textureManager.getTexture("robotsprite.png"));
 	indicator.setTextureRect(sf::IntRect(0,0,64,64));
 
+	
+	textureManager.loadTexture("Background.png");
+	Background* background = new Background(textureManager.getTexture("Background.png"), window);
+	addGameObject(background, GameState::SET_ALGORITHM, 2);
+	addGameObject(background, GameState::SET_POSITION, 2);
+	addGameObject(background, GameState::RUNNING, 2);
+	addGameObject(background, GameState::PAUSED, 2);
+	addGameObject(background, GameState::END, 2);
+	
 	this->changeState(GameState::SET_ALGORITHM);
 	
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
@@ -73,6 +82,23 @@ Game::~Game()
 	{
 		delete gameObjectPtr.first;
 	}
+}
+/*
+	1 for zoom in, -1 for zoom out.
+*/
+void Game::zoom(int direction)
+{
+	int newZoomLevel = zoomLevel + direction;
+	newZoomLevel = std::max(newZoomLevel, -1);
+	newZoomLevel = std::min(newZoomLevel, 1);
+	switch (newZoomLevel - zoomLevel)
+	{
+		case 2: layerView[1].zoom(0.25); break;
+		case 1: layerView[1].zoom(0.50); break;
+		case -1: layerView[1].zoom(2); break;
+		case -2: layerView[1].zoom(4); break;
+	}
+	zoomLevel = newZoomLevel;
 }
 
 /**
@@ -96,6 +122,15 @@ void Game::handleInput(sf::RenderWindow& window)
 			{
 				layerView[i].setViewport(sf::FloatRect((w-usedWidth)/(2*w),0.0f,usedWidth/w,1.0f));
 			}
+		}
+		if (event.type == sf::Event::MouseWheelScrolled) // mouse wheel zooming
+		{
+			zoom((int)event.mouseWheelScroll.delta);
+		}
+		if (event.type == sf::Event::KeyPressed) // keyboard zooming
+		{
+			if (event.key.code == sf::Keyboard::Z) zoom(-1);
+			if (event.key.code == sf::Keyboard::X) zoom(1);
 		}
 		if (event.type == sf::Event::MouseMoved) // drag to scroll layer 1
 		{
@@ -217,6 +252,7 @@ void Game::enterState(GameState gameState)
 			textDisplay.setString("RUNNING UCS");
 		}
 		algorithm->start();
+		algorithmTime = sf::Time::Zero;
 	}
 	else if (gameState == PAUSED)
 	{
@@ -234,7 +270,14 @@ void Game::addGameObject(GameObject* gameObjectPtr, GameState gameState, int lay
 	this->gameObjects[gameObjectPtr].insert(gameState);
 }
 
-void Game::exitState(GameState gameState) {}
+void Game::exitState(GameState gameState) 
+{
+	if (gameState == RUNNING)
+	{
+		delete algorithm;
+		algorithm = NULL;
+	}
+}
 
 /**
 	Updates GameObjects, given that there has been deltaTime since the last update.
@@ -252,14 +295,27 @@ void Game::update(sf::Time deltaTime)
 
 	if (gameState == GameState::RUNNING)
 	{
-		std::cout<<"Running BFS"<<std::endl;
-		while (!algorithm->finished())
+		algorithmTime += deltaTime;
+		sf::Time timeStep = sf::milliseconds(250);
+		while (algorithmTime >= timeStep)
 		{
-			//std::cout<<"Next iteration!"<<std::endl;
-			algorithm->next();
+			if (algorithm->finished())
+			{
+				mazeDisplay->clearAllMarks();
+				robot->executeSolution(algorithm->getSolution(), mazeDisplay);
+				changeState(GameState::END);
+				break;
+			}
+			else
+			{
+				//std::cout<<"Next iteration!"<<std::endl;
+				SearchState s = algorithm->next();
+				mazeDisplay->setMark(s.location.x, s.location.y, sf::Color(100,100,255));
+			}
+			algorithmTime -= timeStep;
 		}
-		robot->executeSolution(algorithm->getSolution(), mazeDisplay);
-		changeState(GameState::END);
+		
+		
 	}
 }
 

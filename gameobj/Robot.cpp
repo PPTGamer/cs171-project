@@ -64,6 +64,7 @@ void Robot::executeSolution(std::vector<SearchState> solution, MazeDisplay* maze
 void Robot::handleInput(sf::Event event, sf::RenderWindow& window, GameState gameState)
 {
 	if (gameState != GameState::RUNNING) return;
+	/*
 	if(event.type == sf::Event::MouseButtonPressed)
 	{
 		if (event.mouseButton.button == sf::Mouse::Left)
@@ -121,6 +122,7 @@ void Robot::handleInput(sf::Event event, sf::RenderWindow& window, GameState gam
 			this->handleInput("DOWN");
 		}
 	}
+	*/
 }
 
 void Robot::update(sf::Time deltaTime)

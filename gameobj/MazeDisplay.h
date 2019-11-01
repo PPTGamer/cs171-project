@@ -152,6 +152,10 @@ public:
 			indicators.erase(key);
 		}
 	}
+	void clearAllMarks()
+	{
+		indicators.clear();
+	}
 	sf::Vector2i getTileIndexAtPixel(sf::Vector2f worldCoordinates)
 	{
 		sf::Vector2f target = worldCoordinates - position;

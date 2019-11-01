@@ -38,13 +38,16 @@ private:
 	GameState gameState;
 	AlgorithmType algorithmType;
 	Algorithm* algorithm;
+	sf::Time algorithmTime;
 	void enterState(GameState gameState);
 	void exitState(GameState gameState);
 	void addGameObject(GameObject* gameObjectPtr, GameState gameState, int layer = 1);
-
+	void zoom(int direction);
+	
 	// Input handling
 	int oldMouseX = -1, oldMouseY = -1;
-	
+	int zoomLevel = 0;
+
 	// Views
 	static const int NUM_LAYERS = 3;
 	sf::View layerView[NUM_LAYERS];

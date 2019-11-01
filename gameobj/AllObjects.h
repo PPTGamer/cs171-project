@@ -6,5 +6,6 @@
 #include "Robot.h"
 #include "MazeDisplay.h"
 #include "Button.h"
+#include "Background.h"
 
 #endif
