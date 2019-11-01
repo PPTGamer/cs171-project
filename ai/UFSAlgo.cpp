@@ -35,7 +35,7 @@ SearchState UFSAlgo::next(){
            ) 
         {
             if (this->maze(nx, ny) == Maze::KEY){
-                t.keys.insert(sf::Vector2i(nx, ny));
+                t.keys.insert({nx, ny});
             }
             if (this->maze(nx, ny) == Maze::ROCKY){
                 t.cost += 3;

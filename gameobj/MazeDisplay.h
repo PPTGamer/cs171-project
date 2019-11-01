@@ -98,6 +98,10 @@ public:
 		this->displayFont = font;
 		refreshTiles();
 	}
+	Maze getMaze()
+	{
+		return maze;
+	}
 	/*
 		Get size of maze display, in pixels.
 	*/
@@ -148,6 +152,10 @@ public:
 	sf::RectangleShape* getTileAtPixel(sf::Vector2f worldCoordinates)
 	{
 		sf::Vector2i tileIndex = getTileIndexAtPixel(worldCoordinates);
+		return getTileAtIndex(tileIndex);
+	}
+	sf::RectangleShape* getTileAtIndex(sf::Vector2i tileIndex)
+	{
 		int column = tileIndex.x, row = tileIndex.y;
 		if (column < 0 || row < 0 || column >= maze.getSize().x || row >= maze.getSize().y)
 		{

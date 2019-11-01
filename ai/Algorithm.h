@@ -1,11 +1,14 @@
 #ifndef ALGORITHM_H
 #define ALGORITHM_H
 
+#include <deque>
+#include <vector>
+#include <SFML/Graphics.hpp>
+
 #include "Maze.h"
 #include "SearchState.h"
 
-#include <deque>
-#include <vector>
+
 
 class Algorithm{
 protected:
@@ -35,7 +38,7 @@ protected:
                     goalstate.location = sf::Vector2i(i, j);
                 }
                 if (maze(i, j) == Maze::KEY){
-                    goalstate.keys.insert(sf::Vector2i(i, j));
+                    goalstate.keys.insert({i, j});
                 }
             }
         }

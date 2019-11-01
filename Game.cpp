@@ -166,11 +166,7 @@ void Game::handleInput(sf::RenderWindow& window)
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
 				if (rectPtr != NULL && mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates)) == Maze::EntryType::EMPTY)
 				{
-					sf::Vector2f robotPosition = rectPtr->getPosition();
-					robotPosition.x += rectPtr->getSize().x/2;
-					robotPosition.y += rectPtr->getSize().y/2;
-					robot->setPosition(robotPosition);
-					this->changeState(GameState::RUNNING);
+					setPosition(mazeDisplay->getTileIndexAtPixel(window.mapPixelToCoords(pixelCoordinates)));
 				}
 			}
 		}
@@ -280,4 +276,15 @@ void Game::setAlgorithm(AlgorithmType algorithmType)
 {
 	this->algorithmType = algorithmType;
 	changeState(GameState::SET_POSITION);
+}
+
+void Game::setPosition(sf::Vector2i tileIndex)
+{
+	sf::RectangleShape* rectPtr = mazeDisplay->getTileAtIndex(tileIndex);
+	sf::Vector2f robotPosition = rectPtr->getPosition();
+	robotPosition.x += rectPtr->getSize().x/2;
+	robotPosition.y += rectPtr->getSize().y/2;
+	robot->setPosition(robotPosition);
+	mazeDisplay->getMaze().setStartingPoint(tileIndex);
+	this->changeState(GameState::RUNNING);
 }

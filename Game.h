@@ -12,6 +12,9 @@
 
 #include "enums.h"
 
+#include "ai/Algorithm.h"
+#include "ai/BFSAlgo.h"
+
 // Resource managers
 #include "managers/TextureManager.h"
 
@@ -30,9 +33,11 @@ public:
 	void update(sf::Time deltaTime);
 	void draw(sf::RenderTarget& target);
 	void setAlgorithm(AlgorithmType algorithmType);
+	void setPosition(sf::Vector2i tileIndex);
 private:
 	GameState gameState;
 	AlgorithmType algorithmType;
+	Algorithm* algorithm;
 	void enterState(GameState gameState);
 	void exitState(GameState gameState);
 	void addGameObject(GameObject* gameObjectPtr, GameState gameState, int layer = 1);
