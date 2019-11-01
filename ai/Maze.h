@@ -17,7 +17,7 @@ private:
 	int width;
 	int startx, starty;
 public:
-	enum EntryType {EMPTY, WALL, START, END, KEY, ROUGH};
+	enum EntryType {EMPTY, WALL, START, END, KEY, ROCKY};
 	enum DirectionType {NORTH, WEST, SOUTH, EAST};
 	sf::Vector2i getSize() const { return sf::Vector2i(width, height); }
 	/*

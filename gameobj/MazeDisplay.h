@@ -94,7 +94,7 @@ public:
 		this->textureMap[Maze::EntryType::KEY] = textureManager->getTexture("floor.png");
 		this->textureMap[Maze::EntryType::START] = textureManager->getTexture("floor.png");
 		this->textureMap[Maze::EntryType::END] = textureManager->getTexture("floor.png");
-		this->textureMap[Maze::EntryType::ROUGH] = textureManager->getTexture("mudfloor.png");
+		this->textureMap[Maze::EntryType::ROCKY] = textureManager->getTexture("mudfloor.png");
 		this->displayFont = font;
 		refreshTiles();
 	}
