@@ -73,6 +73,24 @@ Game::~Game()
 		delete gameObjectPtr.first;
 	}
 }
+/*
+	1 for zoom in, -1 for zoom out.
+*/
+void Game::zoom(int direction)
+{
+	int newZoomLevel = zoomLevel + direction;
+	std::cout<<newZoomLevel<<std::endl;
+	newZoomLevel = std::max(newZoomLevel, -1);
+	newZoomLevel = std::min(newZoomLevel, 1);
+	switch (newZoomLevel - zoomLevel)
+	{
+		case 2: layerView[1].zoom(0.25); break;
+		case 1: layerView[1].zoom(0.50); break;
+		case -1: layerView[1].zoom(2); break;
+		case -2: layerView[1].zoom(4); break;
+	}
+	zoomLevel = newZoomLevel;
+}
 
 /**
 	Obtains input events from a RenderWindow.
@@ -95,6 +113,15 @@ void Game::handleInput(sf::RenderWindow& window)
 			{
 				layerView[i].setViewport(sf::FloatRect((w-usedWidth)/(2*w),0.0f,usedWidth/w,1.0f));
 			}
+		}
+		if (event.type == sf::Event::MouseWheelScrolled) // mouse wheel zooming
+		{
+			zoom((int)event.mouseWheelScroll.delta);
+		}
+		if (event.type == sf::Event::KeyPressed) // keyboard zooming
+		{
+			if (event.key.code == sf::Keyboard::Z) zoom(-1);
+			if (event.key.code == sf::Keyboard::X) zoom(1);
 		}
 		if (event.type == sf::Event::MouseMoved) // drag to scroll layer 1
 		{
