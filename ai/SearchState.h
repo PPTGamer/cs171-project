@@ -27,6 +27,12 @@ struct SearchState{
     }
 
     friend bool operator< (const SearchState& lh, const SearchState& rh){
+        if (lh.cost == rh.cost){
+            if (lh.location.x == rh.location.x){
+                return lh.location.y < rh.location.y;
+            }
+            return lh.location.x < rh.location.x;
+        }
         return lh.cost > rh.cost;
     }
 

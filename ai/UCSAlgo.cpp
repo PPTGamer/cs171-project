@@ -37,7 +37,7 @@ SearchState UCSAlgo::next(){
             if (this->maze(nx, ny) == Maze::KEY){
                 t.keys.insert({nx, ny});
             }
-            if (this->maze(nx, ny) == Maze::ROUGH){
+            if (this->maze(nx, ny) == Maze::ROCKY){
                 t.cost += 3;
             }
             else{

@@ -19,7 +19,7 @@ private:
 	sf::Vector2i start;
 	sf::Vector2i end;
 public:
-	enum EntryType {EMPTY, WALL, START, END, KEY, ROUGH};
+	enum EntryType {EMPTY, WALL, START, END, KEY, ROCKY};
 	enum DirectionType {NORTH, WEST, SOUTH, EAST};
 	sf::Vector2i getSize() const { return sf::Vector2i(width, height); }
 	/*
@@ -131,7 +131,7 @@ private:
 
 		std::random_device dev;
 		std::mt19937 rng(dev());
-		std::uniform_int_distribution<std::mt19937::result_type> dist_keys(1, 4); // There are at most 20% of empty cells as cells with keys
+		std::uniform_int_distribution<std::mt19937::result_type> dist_keys(1, 4);
 		std::uniform_int_distribution<std::mt19937::result_type> dist_width(1, width - 2);
 		std::uniform_int_distribution<std::mt19937::result_type> dist_height(1, height - 2);
 
@@ -151,7 +151,7 @@ private:
 		std::mt19937 rng(dev());
 		std::uniform_int_distribution<std::mt19937::result_type> dist_terrain(0, 4); //20% chance that an "EMPTY" cell will be "ROCKY"
 		if (dist_terrain(rng) < 4) return EMPTY;
-		return ROUGH;
+		return ROCKY;
 	}
 	void randomEnd(){
 		auto endCandidate = this->gen_cell();

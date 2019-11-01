@@ -14,6 +14,7 @@ class Algorithm{
 protected:
     std::deque<SearchState> fringe;
     std::vector<SearchState> solution;
+    std::map<SearchState, SearchState> parent;
     SearchState goalstate;
     Maze maze;
 public:
