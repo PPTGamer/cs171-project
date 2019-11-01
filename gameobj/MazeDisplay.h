@@ -34,9 +34,12 @@ private:
 
 				if(textureMap.find(maze(x,y)) != textureMap.end())
 				{
-					int numTiles = textureMap[maze(x,y)]->getSize().x / TILE_SIZE;
-					tiles[x][y].setTexture(textureMap[maze(x,y)]);
-					tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
+					if (tiles[x][y].getTexture() != textureMap[maze(x,y)])
+					{
+						int numTiles = textureMap[maze(x,y)]->getSize().x / TILE_SIZE;
+						tiles[x][y].setTexture(textureMap[maze(x,y)]);
+						tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
+					}
 				}
 				else
 				{
@@ -94,9 +97,18 @@ public:
 		this->textureMap[Maze::EntryType::KEY] = textureManager->getTexture("floor.png");
 		this->textureMap[Maze::EntryType::START] = textureManager->getTexture("floor.png");
 		this->textureMap[Maze::EntryType::END] = textureManager->getTexture("floor.png");
-		this->textureMap[Maze::EntryType::ROUGH] = textureManager->getTexture("mudfloor.png");
+		this->textureMap[Maze::EntryType::ROCKY] = textureManager->getTexture("mudfloor.png");
 		this->displayFont = font;
 		refreshTiles();
+	}
+	void setStartingPosition(sf::Vector2i position)
+	{
+		maze.setStartingPoint(position);
+		refreshTiles();
+	}
+	const Maze getMaze()
+	{
+		return maze;
 	}
 	/*
 		Get size of maze display, in pixels.
@@ -148,6 +160,10 @@ public:
 	sf::RectangleShape* getTileAtPixel(sf::Vector2f worldCoordinates)
 	{
 		sf::Vector2i tileIndex = getTileIndexAtPixel(worldCoordinates);
+		return getTileAtIndex(tileIndex);
+	}
+	sf::RectangleShape* getTileAtIndex(sf::Vector2i tileIndex)
+	{
 		int column = tileIndex.x, row = tileIndex.y;
 		if (column < 0 || row < 0 || column >= maze.getSize().x || row >= maze.getSize().y)
 		{

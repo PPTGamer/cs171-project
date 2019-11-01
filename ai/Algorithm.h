@@ -1,11 +1,14 @@
 #ifndef ALGORITHM_H
 #define ALGORITHM_H
 
+#include <deque>
+#include <vector>
+#include <SFML/Graphics.hpp>
+
 #include "Maze.h"
 #include "SearchState.h"
 
-#include <deque>
-#include <vector>
+
 
 class Algorithm{
 protected:

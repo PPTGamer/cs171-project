@@ -15,13 +15,14 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 		std::cout<<"Unable to load font!"<<std::endl;
 	}
 	
-	Maze maze(4, 4);
+	Maze maze(8, 8);
 	maze.generate();
 	mazeDisplay = new MazeDisplay(HUDFont, &textureManager, maze);
 	addGameObject(mazeDisplay, GameState::SET_POSITION);
 	addGameObject(mazeDisplay, GameState::SET_ALGORITHM);
 	addGameObject(mazeDisplay, GameState::RUNNING);
 	addGameObject(mazeDisplay, GameState::PAUSED);
+	addGameObject(mazeDisplay, GameState::END);
 	mazeDisplay->setPosition(sf::Vector2f(
 		400-mazeDisplay->getSize().x/2.0, 
 		300-mazeDisplay->getSize().y/2.0
@@ -31,6 +32,7 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	robot = new Robot(textureManager.getTexture("robotsprite.png"));
 	addGameObject(robot, GameState::RUNNING);
 	addGameObject(robot, GameState::PAUSED);
+	addGameObject(robot, GameState::END);
 
 	Button* button1 = new Button(this);
 	button1->setPosition(sf::Vector2f(50, 100));
@@ -166,11 +168,7 @@ void Game::handleInput(sf::RenderWindow& window)
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
 				if (rectPtr != NULL && mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates)) == Maze::EntryType::EMPTY)
 				{
-					sf::Vector2f robotPosition = rectPtr->getPosition();
-					robotPosition.x += rectPtr->getSize().x/2;
-					robotPosition.y += rectPtr->getSize().y/2;
-					robot->setPosition(robotPosition);
-					this->changeState(GameState::RUNNING);
+					setPosition(mazeDisplay->getTileIndexAtPixel(window.mapPixelToCoords(pixelCoordinates)));
 				}
 			}
 		}
@@ -218,10 +216,15 @@ void Game::enterState(GameState gameState)
 		{
 			textDisplay.setString("RUNNING UCS");
 		}
+		algorithm->start();
 	}
 	else if (gameState == PAUSED)
 	{
 		textDisplay.setString("SIMULATION PAUSED");
+	}
+	else if (gameState == END)
+	{
+		textDisplay.setString("DONE");
 	}
 }
 
@@ -245,6 +248,18 @@ void Game::update(sf::Time deltaTime)
 		{
 			gameObject.first->update(deltaTime);
 		}
+	}
+
+	if (gameState == GameState::RUNNING)
+	{
+		std::cout<<"Running BFS"<<std::endl;
+		while (!algorithm->finished())
+		{
+			//std::cout<<"Next iteration!"<<std::endl;
+			algorithm->next();
+		}
+		robot->executeSolution(algorithm->getSolution(), mazeDisplay);
+		changeState(GameState::END);
 	}
 }
 
@@ -279,5 +294,25 @@ void Game::draw(sf::RenderTarget& target)
 void Game::setAlgorithm(AlgorithmType algorithmType)
 {
 	this->algorithmType = algorithmType;
+	if (algorithmType == AlgorithmType::BFS)
+	{
+		algorithm = new BFSAlgo();
+	}
+	else if (algorithmType == AlgorithmType::UCS)
+	{
+		// to do: add UCS
+	}
 	changeState(GameState::SET_POSITION);
+}
+
+void Game::setPosition(sf::Vector2i tileIndex)
+{
+	sf::RectangleShape* rectPtr = mazeDisplay->getTileAtIndex(tileIndex);
+	sf::Vector2f robotPosition = rectPtr->getPosition();
+	robotPosition.x += rectPtr->getSize().x/2;
+	robotPosition.y += rectPtr->getSize().y/2;
+	robot->setPosition(robotPosition);
+	mazeDisplay->setStartingPosition(tileIndex);
+	algorithm->setMaze(mazeDisplay->getMaze());
+	this->changeState(GameState::RUNNING);
 }

@@ -7,7 +7,6 @@
 #include <SFML/Graphics.hpp>
 
 void BFSAlgo::start(){
-    SearchState first;
     first.location = maze.getStart();
     fringe.push_front(first);
     fillGoalState();
@@ -49,11 +48,12 @@ std::vector<SearchState> BFSAlgo::getSolution(){
     }
     int gx = this->goalstate.location.x, gy = this->goalstate.location.y;
     solution.push_back(SearchState(gx, gy));
-    while(not (parent[gy][gx].location == sf::Vector2i(0, 0))){
+    while(not (parent[gy][gx] == first)){
         solution.push_back(parent[gy][gx]);
         gy = parent[gy][gx].location.y;
         gx = parent[gy][gx].location.x;
     }
+    std::reverse(solution.begin(), solution.end());
     return solution;
 }
 std::deque<SearchState> BFSAlgo::getFringe(){
