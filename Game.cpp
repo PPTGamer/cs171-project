@@ -217,6 +217,7 @@ void Game::enterState(GameState gameState)
 			textDisplay.setString("RUNNING UCS");
 		}
 		algorithm->start();
+		algorithmTime = sf::Time::Zero;
 	}
 	else if (gameState == PAUSED)
 	{
@@ -234,7 +235,14 @@ void Game::addGameObject(GameObject* gameObjectPtr, GameState gameState, int lay
 	this->gameObjects[gameObjectPtr].insert(gameState);
 }
 
-void Game::exitState(GameState gameState) {}
+void Game::exitState(GameState gameState) 
+{
+	if (gameState == RUNNING)
+	{
+		delete algorithm;
+		algorithm = NULL;
+	}
+}
 
 /**
 	Updates GameObjects, given that there has been deltaTime since the last update.
@@ -252,14 +260,27 @@ void Game::update(sf::Time deltaTime)
 
 	if (gameState == GameState::RUNNING)
 	{
-		std::cout<<"Running BFS"<<std::endl;
-		while (!algorithm->finished())
+		algorithmTime += deltaTime;
+		sf::Time timeStep = sf::milliseconds(250);
+		while (algorithmTime >= timeStep)
 		{
-			//std::cout<<"Next iteration!"<<std::endl;
-			algorithm->next();
+			if (algorithm->finished())
+			{
+				mazeDisplay->clearAllMarks();
+				robot->executeSolution(algorithm->getSolution(), mazeDisplay);
+				changeState(GameState::END);
+				break;
+			}
+			else
+			{
+				//std::cout<<"Next iteration!"<<std::endl;
+				SearchState s = algorithm->next();
+				mazeDisplay->setMark(s.location.x, s.location.y, sf::Color(100,100,255));
+			}
+			algorithmTime -= timeStep;
 		}
-		robot->executeSolution(algorithm->getSolution(), mazeDisplay);
-		changeState(GameState::END);
+		
+		
 	}
 }
 
