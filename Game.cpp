@@ -79,7 +79,6 @@ Game::~Game()
 void Game::zoom(int direction)
 {
 	int newZoomLevel = zoomLevel + direction;
-	std::cout<<newZoomLevel<<std::endl;
 	newZoomLevel = std::max(newZoomLevel, -1);
 	newZoomLevel = std::min(newZoomLevel, 1);
 	switch (newZoomLevel - zoomLevel)
