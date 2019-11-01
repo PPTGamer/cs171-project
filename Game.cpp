@@ -29,7 +29,7 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	));
 	
 	textureManager.loadTexture("robotsprite.png");
-	robot = new Robot(textureManager.getTexture("robotsprite.png"));
+	robot = new Robot(textureManager.getTexture("robotsprite.png"), mazeDisplay);
 	addGameObject(robot, GameState::RUNNING);
 	addGameObject(robot, GameState::PAUSED);
 	addGameObject(robot, GameState::END);
@@ -71,8 +71,8 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	addGameObject(background, GameState::PAUSED, 2);
 	addGameObject(background, GameState::END, 2);
 	
-	this->changeState(GameState::SET_ALGORITHM);
-	
+	this->enterState(GameState::SET_ALGORITHM);
+	this->gameState = SET_ALGORITHM;
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
 }
 
@@ -243,16 +243,7 @@ void Game::enterState(GameState gameState)
 	}
 	else if (gameState == RUNNING)
 	{
-		if (this->algorithmType == AlgorithmType::BFS)
-		{
-			textDisplay.setString("RUNNING BFS");
-		}
-		if (this->algorithmType == AlgorithmType::UCS)
-		{
-			textDisplay.setString("RUNNING UCS");
-		}
-		algorithm->start();
-		algorithmTime = sf::Time::Zero;
+		// none
 	}
 	else if (gameState == PAUSED)
 	{
@@ -260,6 +251,8 @@ void Game::enterState(GameState gameState)
 	}
 	else if (gameState == END)
 	{
+		delete algorithm;
+		algorithm = NULL;
 		textDisplay.setString("DONE");
 	}
 }
@@ -272,10 +265,18 @@ void Game::addGameObject(GameObject* gameObjectPtr, GameState gameState, int lay
 
 void Game::exitState(GameState gameState) 
 {
-	if (gameState == RUNNING)
+	if (gameState == SET_POSITION)
 	{
-		delete algorithm;
-		algorithm = NULL;
+		if (this->algorithmType == AlgorithmType::BFS)
+		{
+			textDisplay.setString("RUNNING BFS");
+		}
+		if (this->algorithmType == AlgorithmType::UCS)
+		{
+			textDisplay.setString("RUNNING UCS");
+		}
+		algorithm->start();
+		algorithmTime = sf::Time::Zero;
 	}
 }
 
@@ -296,7 +297,7 @@ void Game::update(sf::Time deltaTime)
 	if (gameState == GameState::RUNNING)
 	{
 		algorithmTime += deltaTime;
-		sf::Time timeStep = sf::milliseconds(250);
+		sf::Time timeStep = sf::milliseconds(50);
 		while (algorithmTime >= timeStep)
 		{
 			if (algorithm->finished())
@@ -308,14 +309,25 @@ void Game::update(sf::Time deltaTime)
 			}
 			else
 			{
-				//std::cout<<"Next iteration!"<<std::endl;
-				SearchState s = algorithm->next();
-				mazeDisplay->setMark(s.location.x, s.location.y, sf::Color(100,100,255));
+				SearchState expanded = algorithm->next();
+				mazeDisplay->clearAllMarks();
+				for (auto state : algorithm->getFringe())
+				{
+					sf::Color markColor = sf::Color(100,100,105);
+					markColor.b += state.keys.size()*50;
+					std::string keysString;
+					std::stringstream ss;
+					for (auto key : state.keys)
+					{
+						ss<<"("<<key.first<<","<<key.second<<")"<<std::endl;
+					}
+					keysString = ss.str();
+					mazeDisplay->setMark(state.location.x, state.location.y, markColor, keysString);
+				}
+				mazeDisplay->setMark(expanded.location.x, expanded.location.y, sf::Color::Yellow);
 			}
 			algorithmTime -= timeStep;
 		}
-		
-		
 	}
 }
 

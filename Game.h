@@ -2,6 +2,7 @@
 #define GAME_H
 // Standard libraries
 #include <cmath>
+#include <sstream>
 #include <iostream>
 #include <vector>
 #include <memory>

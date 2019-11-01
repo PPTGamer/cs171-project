@@ -19,7 +19,7 @@ private:
 	sf::Vector2i start;
 	sf::Vector2i end;
 public:
-	enum EntryType {EMPTY, WALL, START, END, KEY, ROCKY};
+	enum EntryType {EMPTY, WALL, START, END, KEY, ROCKY, INVALID};
 	enum DirectionType {NORTH, WEST, SOUTH, EAST};
 	sf::Vector2i getSize() const { return sf::Vector2i(width, height); }
 	/*

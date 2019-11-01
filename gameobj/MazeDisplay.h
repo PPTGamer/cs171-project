@@ -106,6 +106,23 @@ public:
 		maze.setStartingPoint(position);
 		refreshTiles();
 	}
+	void setMazeEntry(int column, int row, Maze::EntryType entry)
+	{
+		if (column < 0 || row < 0 || column >= maze.getSize().x || row >= maze.getSize().y)
+		{
+			return;
+		}
+		maze(column, row) = entry;
+		refreshTiles();
+	}
+	const Maze::EntryType getMazeEntry(int column, int row)
+	{
+		if (column < 0 || row < 0 || column >= maze.getSize().x || row >= maze.getSize().y)
+		{
+			return Maze::EntryType::INVALID;
+		}
+		return maze(column, row);
+	}
 	const Maze getMaze()
 	{
 		return maze;
@@ -134,11 +151,10 @@ public:
 		if (text!="")
 		{
 			newText.setFont(displayFont);
-			newText.setCharacterSize(24);
+			newText.setCharacterSize(18);
 			newText.setString(text);
 			newText.setOutlineColor(sf::Color::Black);
 			newText.setOutlineThickness(2);
-			//newText.setOrigin(newText.getLocalBounds().width/2, newText.getLocalBounds().height/2);
 			newText.setPosition(sf::Vector2f(column*TILE_SIZE,row*TILE_SIZE) + position);
 		}
 

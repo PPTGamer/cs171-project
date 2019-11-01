@@ -20,8 +20,9 @@ class Robot : public GameSprite
 	std::deque<sf::CircleShape> indicators;
 	std::deque<sf::RectangleShape> lines;
 	std::deque<sf::Vector2f> movementQueue;
+	MazeDisplay* mazeDisplay;
 public:
-	Robot(sf::Texture* texture);
+	Robot(sf::Texture* texture, MazeDisplay* mazeDisplay);
 	void setPosition(float x, float y);
 	void setPosition(sf::Vector2f position);
 

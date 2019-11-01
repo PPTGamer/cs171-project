@@ -1,6 +1,7 @@
 #include "Robot.h"
-Robot::Robot(sf::Texture* texture)
+Robot::Robot(sf::Texture* texture, MazeDisplay* mazeDisplay)
 {
+	this->mazeDisplay = mazeDisplay;
 	spriteState = STOP;
 	sprite.setTexture(*texture);
 	sprite.setAnimationLength(16);
@@ -41,10 +42,6 @@ void Robot::moveTo(sf::Vector2f destination)
 	indicator.setPosition(destination);
 	indicators.push_back(indicator);
 }
-void Robot::moveTo(std::vector<sf::Vector2f> points)
-{
-	for (auto point : points) {moveTo(point);}
-}
 
 void Robot::executeSolution(std::vector<SearchState> solution, MazeDisplay* mazeDisplay)
 {
@@ -55,10 +52,8 @@ void Robot::executeSolution(std::vector<SearchState> solution, MazeDisplay* maze
 		sf::Vector2f robotPosition = rectPtr->getPosition();
 		robotPosition.x += rectPtr->getSize().x/2;
 		robotPosition.y += rectPtr->getSize().y/2;
-		std::cout<<solution[i].location.x<< " " << solution[i].location.y << std::endl;
-		path.push_back(robotPosition);
+		moveTo(robotPosition);
 	}
-	moveTo(path);
 }
 
 void Robot::handleInput(sf::Event event, sf::RenderWindow& window, GameState gameState)
@@ -141,6 +136,13 @@ void Robot::update(sf::Time deltaTime)
 			{
 				spriteState = STOP;
 				sprite.setPosition(destination);
+				// arrived at destination, remove keys
+				sf::Vector2i tileIndex = mazeDisplay->getTileIndexAtPixel(destination);
+				if (mazeDisplay->getMazeEntry(tileIndex.x, tileIndex.y) == Maze::EntryType::KEY)
+				{
+					mazeDisplay->setMazeEntry(tileIndex.x, tileIndex.y, Maze::EntryType::EMPTY);
+				}
+
 				movementQueue.pop_front();
 				indicators.pop_front();
 				if(!lines.empty()) lines.pop_front();
