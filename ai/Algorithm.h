@@ -1,10 +1,11 @@
 #ifndef ALGORITHM_H
 #define ALGORITHM_H
 
+#include "Maze.h"
+#include "SearchState.h"
+
 #include <deque>
 #include <vector>
-#include <Maze.h>
-#include<SearchState.h>
 
 class Algorithm{
 protected:
