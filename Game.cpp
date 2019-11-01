@@ -62,6 +62,15 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	indicator.setTexture(*textureManager.getTexture("robotsprite.png"));
 	indicator.setTextureRect(sf::IntRect(0,0,64,64));
 
+	
+	textureManager.loadTexture("Background.png");
+	Background* background = new Background(textureManager.getTexture("Background.png"), window);
+	addGameObject(background, GameState::SET_ALGORITHM, 2);
+	addGameObject(background, GameState::SET_POSITION, 2);
+	addGameObject(background, GameState::RUNNING, 2);
+	addGameObject(background, GameState::PAUSED, 2);
+	addGameObject(background, GameState::END, 2);
+	
 	this->changeState(GameState::SET_ALGORITHM);
 	
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
@@ -73,6 +82,23 @@ Game::~Game()
 	{
 		delete gameObjectPtr.first;
 	}
+}
+/*
+	1 for zoom in, -1 for zoom out.
+*/
+void Game::zoom(int direction)
+{
+	int newZoomLevel = zoomLevel + direction;
+	newZoomLevel = std::max(newZoomLevel, -1);
+	newZoomLevel = std::min(newZoomLevel, 1);
+	switch (newZoomLevel - zoomLevel)
+	{
+		case 2: layerView[1].zoom(0.25); break;
+		case 1: layerView[1].zoom(0.50); break;
+		case -1: layerView[1].zoom(2); break;
+		case -2: layerView[1].zoom(4); break;
+	}
+	zoomLevel = newZoomLevel;
 }
 
 /**
@@ -96,6 +122,15 @@ void Game::handleInput(sf::RenderWindow& window)
 			{
 				layerView[i].setViewport(sf::FloatRect((w-usedWidth)/(2*w),0.0f,usedWidth/w,1.0f));
 			}
+		}
+		if (event.type == sf::Event::MouseWheelScrolled) // mouse wheel zooming
+		{
+			zoom((int)event.mouseWheelScroll.delta);
+		}
+		if (event.type == sf::Event::KeyPressed) // keyboard zooming
+		{
+			if (event.key.code == sf::Keyboard::Z) zoom(-1);
+			if (event.key.code == sf::Keyboard::X) zoom(1);
 		}
 		if (event.type == sf::Event::MouseMoved) // drag to scroll layer 1
 		{
