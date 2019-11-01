@@ -8,7 +8,7 @@
 class BFSAlgo : public Algorithm
 {
 private:
-    vector<vector<SearchState> > parent;
+    std::vector<std::vector<SearchState> > parent;
 public:
     void start();
     SearchState next();

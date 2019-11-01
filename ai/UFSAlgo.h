@@ -4,13 +4,13 @@
 #include "Algorithm.h"
 
 #include <vector>
-#include <priority_queue>
+#include <queue>
 
 class UFSAlgo : public Algorithm
 {
 private:
-    vector<vector<SearchState> > parent;
-    priority_queue<SearchState> prio;
+    std::vector<std::vector<SearchState> > parent;
+    std::priority_queue<SearchState> prio;
 public:
     void start();
     SearchState next();
