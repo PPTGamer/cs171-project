@@ -41,16 +41,22 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	addGameObject(button1, GameState::SET_ALGORITHM, 0);
 		
 	Button* button2 = new Button(this);
-	button2->setPosition(sf::Vector2f(50, 250));
-	button2->setText(&HUDFont, "Uniform-Cost Search");
-	button2->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::UCS);});
+	button2->setPosition(sf::Vector2f(50, 200));
+	button2->setText(&HUDFont, "Depth-First Search");
+	button2->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::DFS);});
 	addGameObject(button2, GameState::SET_ALGORITHM, 0);
 
 	Button* button3 = new Button(this);
-	button3->setPosition(sf::Vector2f(50, 400));
-	button3->setText(&HUDFont, "informed search\n(not implemented yet)");
-	button3->setOnClick([](Game* game){});
+	button3->setPosition(sf::Vector2f(50, 300));
+	button3->setText(&HUDFont, "Uniform-Cost Search");
+	button3->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::UCS);});
 	addGameObject(button3, GameState::SET_ALGORITHM, 0);
+
+	Button* button4 = new Button(this);
+	button4->setPosition(sf::Vector2f(50, 400));
+	button4->setText(&HUDFont, "informed search\n(not implemented yet)");
+	button4->setOnClick([](Game* game){});
+	addGameObject(button4, GameState::SET_ALGORITHM, 0);
 
 	textDisplay.setFont(HUDFont);
 	textDisplay.setCharacterSize(28);
@@ -243,7 +249,18 @@ void Game::enterState(GameState gameState)
 	}
 	else if (gameState == RUNNING)
 	{
-		// none
+		if (this->algorithmType == AlgorithmType::BFS)
+		{
+			textDisplay.setString("RUNNING BFS");
+		}
+		if (this->algorithmType == AlgorithmType::DFS)
+		{
+			textDisplay.setString("RUNNING DFS");
+		}
+		if (this->algorithmType == AlgorithmType::UCS)
+		{
+			textDisplay.setString("RUNNING UCS");
+		}
 	}
 	else if (gameState == PAUSED)
 	{
@@ -267,14 +284,6 @@ void Game::exitState(GameState gameState)
 {
 	if (gameState == SET_POSITION)
 	{
-		if (this->algorithmType == AlgorithmType::BFS)
-		{
-			textDisplay.setString("RUNNING BFS");
-		}
-		if (this->algorithmType == AlgorithmType::UCS)
-		{
-			textDisplay.setString("RUNNING UCS");
-		}
 		algorithm->start();
 		algorithmTime = sf::Time::Zero;
 	}
@@ -366,9 +375,13 @@ void Game::setAlgorithm(AlgorithmType algorithmType)
 	{
 		algorithm = new BFSAlgo();
 	}
+	else if (algorithmType == AlgorithmType::DFS)
+	{
+		algorithm = new DFSAlgo();
+	}
 	else if (algorithmType == AlgorithmType::UCS)
 	{
-		// to do: add UCS
+		algorithm = new UCSAlgo();
 	}
 	changeState(GameState::SET_POSITION);
 }

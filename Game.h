@@ -15,6 +15,8 @@
 
 #include "ai/Algorithm.h"
 #include "ai/BFSAlgo.h"
+#include "ai/DFSAlgo.h"
+#include "ai/UCSAlgo.h"
 
 // Resource managers
 #include "managers/TextureManager.h"
