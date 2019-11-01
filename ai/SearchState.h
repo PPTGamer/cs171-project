@@ -12,7 +12,17 @@ struct SearchState{
     SearchState(int x, int y) : location(x, y), cost(0){};
 
     friend bool operator== (const SearchState& lh, const SearchState& rh){
-        return lh.location == rh.location and lh.keys == rh.keys;
+        bool res = true;
+        res = res && (lh.location == rh.location);
+        for (auto x : lh.keys)
+        {
+            res = res && (rh.keys.find(x) != rh.keys.end());
+        }
+        for (auto x : rh.keys)
+        {
+            res = res && (lh.keys.find(x) != lh.keys.end());
+        }
+        return res;
     }
 
     friend bool operator< (const SearchState& lh, const SearchState& rh){
