@@ -34,9 +34,12 @@ private:
 
 				if(textureMap.find(maze(x,y)) != textureMap.end())
 				{
-					int numTiles = textureMap[maze(x,y)]->getSize().x / TILE_SIZE;
-					tiles[x][y].setTexture(textureMap[maze(x,y)]);
-					tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
+					if (tiles[x][y].getTexture() != textureMap[maze(x,y)])
+					{
+						int numTiles = textureMap[maze(x,y)]->getSize().x / TILE_SIZE;
+						tiles[x][y].setTexture(textureMap[maze(x,y)]);
+						tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
+					}
 				}
 				else
 				{
@@ -98,7 +101,12 @@ public:
 		this->displayFont = font;
 		refreshTiles();
 	}
-	Maze getMaze()
+	void setStartingPosition(sf::Vector2i position)
+	{
+		maze.setStartingPoint(position);
+		refreshTiles();
+	}
+	const Maze getMaze()
 	{
 		return maze;
 	}

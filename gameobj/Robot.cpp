@@ -46,6 +46,21 @@ void Robot::moveTo(std::vector<sf::Vector2f> points)
 	for (auto point : points) {moveTo(point);}
 }
 
+void Robot::executeSolution(std::vector<SearchState> solution, MazeDisplay* mazeDisplay)
+{
+	std::vector<sf::Vector2f> path; 
+	for (int i = 0; i < solution.size(); i++)
+	{
+		sf::RectangleShape* rectPtr = mazeDisplay->getTileAtIndex(solution[i].location);
+		sf::Vector2f robotPosition = rectPtr->getPosition();
+		robotPosition.x += rectPtr->getSize().x/2;
+		robotPosition.y += rectPtr->getSize().y/2;
+		std::cout<<solution[i].location.x<< " " << solution[i].location.y << std::endl;
+		path.push_back(robotPosition);
+	}
+	moveTo(path);
+}
+
 void Robot::handleInput(sf::Event event, sf::RenderWindow& window, GameState gameState)
 {
 	if (gameState != GameState::RUNNING) return;

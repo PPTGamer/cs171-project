@@ -5,6 +5,8 @@
 #include <SFML/Graphics.hpp>
 #include "AnimatedSprite.h"
 #include "GameSprite.h"
+#include "MazeDisplay.h"
+#include "../ai/SearchState.h"
 
 class Robot : public GameSprite
 {
@@ -27,7 +29,8 @@ public:
 	
 	void moveTo(sf::Vector2f destination);
 	void moveTo(std::vector<sf::Vector2f> points);
-	
+	void executeSolution(std::vector<SearchState> solution, MazeDisplay* mazeDisplay);
+
 	void handleInput(sf::Event event, sf::RenderWindow& window, GameState gameState) override;
 	void update(sf::Time deltaTime) override;
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
