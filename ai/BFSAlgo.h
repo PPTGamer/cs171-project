@@ -4,15 +4,15 @@
 #include "Algorithm.h"
 
 #include <vector>
+#include <set>
 
 class BFSAlgo : public Algorithm
 {
-private:
-    std::vector<std::vector<SearchState> > parent;
 public:
-    void start();
-    SearchState next();
-    std::vector<SearchState> getSolution();
-    std::deque<SearchState> getFringe();
+    void start() override;
+    SearchState next() override;
+    std::vector<SearchState> getSolution()  override;
+    bool finished() override;
+    std::deque<SearchState> getFringe() override;
 };
 #endif

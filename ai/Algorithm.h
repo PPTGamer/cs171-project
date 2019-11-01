@@ -14,21 +14,23 @@ class Algorithm{
 protected:
     std::deque<SearchState> fringe;
     std::vector<SearchState> solution;
+    std::map<SearchState, SearchState> parent;
+    SearchState first;
     SearchState goalstate;
     Maze maze;
+
 public:
     Algorithm(){};
     Algorithm(Maze m) : maze(m){};
     void setMaze(Maze m){
         this->maze = m;
     };
+    virtual ~Algorithm() = default;
     virtual void start() = 0;
     virtual SearchState next() = 0;
+    virtual std::deque<SearchState> getFringe() = 0;
     virtual std::vector<SearchState> getSolution() = 0;
-    bool finished(){
-        SearchState test = fringe.front();
-        return test == this->goalstate;
-    }
+    virtual bool finished() = 0;
     
 protected:
     void fillGoalState(){

@@ -5,6 +5,7 @@
 #include <random>
 #include <vector>
 #include <deque>
+#include <SFML/Graphics.hpp>
 /*
  * Usage: Maze maze(width, height)
  * maze.generate() to do the thing
@@ -64,7 +65,19 @@ public:
 		randomDFS();
 		randomKeys();
 		randomEnd();
-		printMaze();
+	}
+	void printMaze(){
+		for (auto row : v){
+			for (int cell : row){
+				if (cell == WALL)
+					std::cout << '#';
+				else if (cell == EMPTY)
+					std::cout << '.';
+				else
+					std::cout << cell;
+			}
+			std::cout << std::endl;
+		}
 	}
 private:
 	sf::Vector2i gen_start(){
@@ -89,7 +102,6 @@ private:
 		std::deque<sf::Vector2i> fringe;
 		sf::Vector2i generated_startpos = gen_start();
 		this->start = generated_startpos;
-		v[this->start.y][this->start.x] = START;
 		fringe.push_back(this->start);
 		std::cout << "starting coordinates: " << this->start.x << ' ' << this->start.y << std::endl;
 		while(not fringe.empty()){
@@ -104,7 +116,7 @@ private:
 				int ny = py + dy[order[i]];
 				if (out_of_bounds(nx, ny)) continue;
 				if (v[ny][nx] == WALL){
-					v[py][px] = v[ny][nx] = EMPTY;
+					v[py][px] = v[ny][nx] = chooseTerrain();
 					fringe.push_back(sf::Vector2i(nx, ny));
 				}
 			}
@@ -119,11 +131,12 @@ private:
 
 		std::random_device dev;
 		std::mt19937 rng(dev());
-		std::uniform_int_distribution<std::mt19937::result_type> dist_keys(1, empty / 5); // There are at most 20% of empty cells as cells with keys
+		std::uniform_int_distribution<std::mt19937::result_type> dist_keys(1, 4);
 		std::uniform_int_distribution<std::mt19937::result_type> dist_width(1, width - 2);
 		std::uniform_int_distribution<std::mt19937::result_type> dist_height(1, height - 2);
 
 		int number_of_keys = dist_keys(rng);
+		//number_of_keys = 1;
 		std::cout << "Generating " << number_of_keys << " keys" << std::endl;
 		while(number_of_keys > 0){
 			int randx = dist_width(rng), randy = dist_height(rng);
@@ -147,19 +160,6 @@ private:
 		}
 		this->end = endCandidate;
 		v[endCandidate.x][endCandidate.y] = END;
-	}
-	void printMaze(){
-		for (auto row : v){
-			for (int cell : row){
-				if (cell == WALL)
-					std::cout << '#';
-				else if (cell == EMPTY)
-					std::cout << '.';
-				else
-					std::cout << cell;
-			}
-			std::cout << std::endl;
-		}
 	}
 };
 
