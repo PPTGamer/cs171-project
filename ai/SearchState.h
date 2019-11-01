@@ -33,10 +33,11 @@ struct SearchState{
     friend std::ostream& operator<< (std::ostream& stream, const SearchState& s){
         stream << '(' << s.location.x << ' ' << s.location.y << ')';
         if (s.keys.size() > 0)
-            stream << " with: ";
+            stream << " with ";
         for (auto key : s.keys){
             stream << key.first << ',' << key.second << ' ';
         }
+        stream << " Cost: " << s.cost;
         return stream;
     }
 };

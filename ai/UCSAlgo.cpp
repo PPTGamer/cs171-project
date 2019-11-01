@@ -3,20 +3,13 @@
 #include "Algorithm.h"
 #include "UCSAlgo.h"
 
-#include <SFML/Graphics.hpp>
 #include <vector>
 #include <queue>
-
-#include "SearchState.h"
-#include "Maze.h"
-#include "Algorithm.h"
-#include "UCSAlgo.h"
-
-#include <vector>
 #include <SFML/Graphics.hpp>
 
 void UCSAlgo::start(){
     first.location = maze.getStart();
+    first.cost = 0;
     prio.insert(first);
     parent[first] = SearchState(-2, -2);
     fillGoalState();
@@ -24,19 +17,19 @@ void UCSAlgo::start(){
     std::cout << "Ending: " << goalstate.location.x << ' ' << goalstate.location.y << std::endl;
 }
 SearchState UCSAlgo::next(){
-    if (fringe.empty()){
+    if (prio.empty()){
         return SearchState(-1, -1);
     }
     int dx[4] = {0, -1, 0, 1};
     int dy[4] = {-1, 0, 1, 0};
-    SearchState s = *prio.rbegin(); prio.rbegin();
-    //std::cout << s << std::endl;
+    SearchState s = *prio.rbegin(); prio.erase(*prio.rbegin());
     for (int i = 0; i < 4; ++i){
         int nx = s.location.x + dx[i], ny = s.location.y + dy[i];
         SearchState t(nx, ny);
         for (auto key : s.keys){
             t.keys.insert(key);
         }
+        t.cost = s.cost + 1;
         if (this->maze(nx, ny) != Maze::WALL and 
             not this->maze.out_of_bounds(nx, ny) ) 
         {
@@ -44,8 +37,11 @@ SearchState UCSAlgo::next(){
                 if (this->maze(nx, ny) == Maze::KEY){
                     t.keys.insert({nx, ny});
                 }
+                if (this->maze(nx, ny) == Maze::ROCKY){
+                    t.cost += 6;
+                }
                 this->parent[t] = s;
-                fringe.push_back(t);
+                prio.insert(t);
             }
         }
     }
@@ -55,8 +51,7 @@ std::vector<SearchState> UCSAlgo::getSolution(){
     if (not this->finished()){
         return std::vector<SearchState>(0);
     }
-    SearchState last = goalstate;
-    std::cout << "solution:" << std::endl;
+    SearchState last = this->arrival;
     while(not (parent[last] == SearchState(-2, -2))){
         solution.push_back(last);
         last = parent[last];
@@ -72,5 +67,6 @@ std::deque<SearchState> UCSAlgo::getFringe(){
     return x;
 }
 bool UCSAlgo::finished(){
-    return fringe.front() == goalstate;
+    this->arrival = *prio.rbegin();
+    return *prio.rbegin() == goalstate;
 }
