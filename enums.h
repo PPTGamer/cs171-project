@@ -3,7 +3,7 @@
 
 enum GameState : int
 {
-	SET_POSITION, SET_ALGORITHM, RUNNING, PAUSED
+	SET_ALGORITHM, SET_POSITION, RUNNING, PAUSED
 };
 
 enum AlgorithmType : int

@@ -3,12 +3,12 @@
 
 int main()
 {
-	Game* game = new Game();
-
 	// create an 800x600 window, respect DPI settings.
 	sf::RenderWindow window(sf::VideoMode(800, 600, sf::VideoMode::getDesktopMode().bitsPerPixel), "SFML works!");
 	window.setFramerateLimit(60);
 	
+	Game* game = new Game(window);
+
 	sf::Clock clock;
 	const sf::Time update_ms = sf::seconds(1.f / 60.f);
 	sf::Time elapsed = clock.restart();

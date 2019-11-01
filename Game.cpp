@@ -1,23 +1,27 @@
 #include "Game.h"
 
-Game::Game(): gameState(SET_POSITION)
+Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 {
 	sf::Clock loadingTime;
 	sf::Time startTime = loadingTime.restart();
-
+	for (int i = 0; i < NUM_LAYERS; i++)
+	{
+		this->layerView[i] = window.getDefaultView();
+	} 
 	// do all loading here
 	// Temporary, add to a font manager later
 	if(!HUDFont.loadFromFile("fonts/Inconsolata-Regular.ttf"))
 	{
 		std::cout<<"Unable to load font!"<<std::endl;
 	}
-
-	textureManager.loadTexture("crate.png");
-	textureManager.loadTexture("floor.png");
+	
 	Maze maze(4, 4);
 	maze.generate();
-	mazeDisplay = new MazeDisplay(HUDFont, textureManager.getTexture("crate.png"), textureManager.getTexture("floor.png"), maze);
-	gameObjects.push_back(mazeDisplay);
+	mazeDisplay = new MazeDisplay(HUDFont, &textureManager, maze);
+	addGameObject(mazeDisplay, GameState::SET_POSITION);
+	addGameObject(mazeDisplay, GameState::SET_ALGORITHM);
+	addGameObject(mazeDisplay, GameState::RUNNING);
+	addGameObject(mazeDisplay, GameState::PAUSED);
 	mazeDisplay->setPosition(sf::Vector2f(
 		400-mazeDisplay->getSize().x/2.0, 
 		300-mazeDisplay->getSize().y/2.0
@@ -25,23 +29,39 @@ Game::Game(): gameState(SET_POSITION)
 	
 	textureManager.loadTexture("robotsprite.png");
 	robot = new Robot(textureManager.getTexture("robotsprite.png"));
-	robot->setPosition(-999,999);
-	gameObjects.push_back(robot);
+	addGameObject(robot, GameState::RUNNING);
+	addGameObject(robot, GameState::PAUSED);
 
-	button1 = new Button(this);
+	Button* button1 = new Button(this);
+	button1->setPosition(sf::Vector2f(50, 100));
 	button1->setText(&HUDFont, "Breadth-First Search");
-	button1->setPosition(-999,-999);
 	button1->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::BFS);});
-	gameObjects.push_back(button1);
-
-	button2 = new Button(this);
+	addGameObject(button1, GameState::SET_ALGORITHM, 0);
+		
+	Button* button2 = new Button(this);
+	button2->setPosition(sf::Vector2f(50, 250));
 	button2->setText(&HUDFont, "Uniform-Cost Search");
-	button2->setPosition(-999,-999);
 	button2->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::UCS);});
-	gameObjects.push_back(button2);
+	addGameObject(button2, GameState::SET_ALGORITHM, 0);
 
-	this->enterState(GameState::SET_POSITION);
+	Button* button3 = new Button(this);
+	button3->setPosition(sf::Vector2f(50, 400));
+	button3->setText(&HUDFont, "informed search\n(not implemented yet)");
+	button3->setOnClick([](Game* game){});
+	addGameObject(button3, GameState::SET_ALGORITHM, 0);
 
+	textDisplay.setFont(HUDFont);
+	textDisplay.setCharacterSize(28);
+	textDisplay.setFillColor(sf::Color::White);
+	textDisplay.setOutlineColor(sf::Color::Black);
+	textDisplay.setOutlineThickness(2);
+
+	indicator.setColor(sf::Color::Transparent);
+	indicator.setTexture(*textureManager.getTexture("robotsprite.png"));
+	indicator.setTextureRect(sf::IntRect(0,0,64,64));
+
+	this->changeState(GameState::SET_ALGORITHM);
+	
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
 }
 
@@ -49,7 +69,7 @@ Game::~Game()
 {
 	for (auto&& gameObjectPtr : gameObjects)
 	{
-		delete gameObjectPtr;
+		delete gameObjectPtr.first;
 	}
 }
 
@@ -70,11 +90,12 @@ void Game::handleInput(sf::RenderWindow& window)
 			float w = event.size.width;
 			float h = event.size.height;
 			float usedWidth = 4.0f/3.0f*h;
-			sf::View currView = window.getView();
-			currView.setViewport(sf::FloatRect((w-usedWidth)/(2*w),0.0f,usedWidth/w,1.0f));
-			window.setView(currView);
+			for (int i = 0 ; i < NUM_LAYERS; i++)
+			{
+				layerView[i].setViewport(sf::FloatRect((w-usedWidth)/(2*w),0.0f,usedWidth/w,1.0f));
+			}
 		}
-		if (event.type == sf::Event::MouseMoved)
+		if (event.type == sf::Event::MouseMoved) // drag to scroll layer 1
 		{
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 			{
@@ -83,17 +104,17 @@ void Game::handleInput(sf::RenderWindow& window)
 					oldMouseX = event.mouseMove.x;
 					oldMouseY = event.mouseMove.y;
 				}
-				sf::View currView = window.getView();
-				currView.move(oldMouseX-event.mouseMove.x, oldMouseY-event.mouseMove.y);
-				currView.setCenter(
-					std::max(currView.getCenter().x, 400.0f-mazeDisplay->getSize().x/2),
-					std::max(currView.getCenter().y, 300.0f-mazeDisplay->getSize().y/2)
+
+				layerView[1].move(oldMouseX-event.mouseMove.x, oldMouseY-event.mouseMove.y);
+				layerView[1].setCenter(
+					std::max(layerView[1].getCenter().x, 400.0f-mazeDisplay->getSize().x/2),
+					std::max(layerView[1].getCenter().y, 300.0f-mazeDisplay->getSize().y/2)
 				);
-				currView.setCenter(
-					std::min(currView.getCenter().x, 400.0f+mazeDisplay->getSize().x/2),
-					std::min(currView.getCenter().y, 300.0f+mazeDisplay->getSize().y/2)
+				layerView[1].setCenter(
+					std::min(layerView[1].getCenter().x, 400.0f+mazeDisplay->getSize().x/2),
+					std::min(layerView[1].getCenter().y, 300.0f+mazeDisplay->getSize().y/2)
 				);
-				window.setView(currView);
+
 				oldMouseX = event.mouseMove.x;
 				oldMouseY = event.mouseMove.y;
 			}
@@ -103,13 +124,19 @@ void Game::handleInput(sf::RenderWindow& window)
 			oldMouseX = -1;
 			oldMouseY = -1;
 		}
-		viewPosition = sf::Vector2f(window.getView().getCenter().x - 400, window.getView().getCenter().y- 300);
-
-		for (auto&& gameObject : gameObjects)
+		for (int currentLayer = NUM_LAYERS - 1; currentLayer >= 0; currentLayer--)
 		{
-			gameObject->handleInput(event, window, gameState);
+			window.setView(layerView[currentLayer]);
+			for(auto const &gameObjectPtr : layerMap[currentLayer])
+			{
+				// if gameObject is part of the current state, handle input for it
+				if (gameObjects[gameObjectPtr].find(gameState) != gameObjects[gameObjectPtr].end())
+				{
+					gameObjectPtr->handleInput(event, window, gameState);
+				}
+			}
 		}
-
+		window.setView(layerView[1]);
 		if (gameState == SET_POSITION)
 		{
 			if (event.type == sf::Event::MouseMoved)
@@ -118,28 +145,32 @@ void Game::handleInput(sf::RenderWindow& window)
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
 				if (rectPtr != NULL)
 				{
+					if (mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates)) == Maze::EntryType::EMPTY)
+					{
+						indicator.setColor(sf::Color(255,255,255,100));
+					}
+					else
+					{
+						indicator.setColor(sf::Color(255,0,0,100));
+					}
 					indicator.setPosition(rectPtr->getPosition());
 				}
 				else
 				{
-					indicator.setPosition(-999,-999);
+					indicator.setColor(sf::Color::Transparent);
 				}
 			}
 			if (event.type == sf::Event::MouseButtonPressed && sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
 				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
-				if (rectPtr != NULL)
+				if (rectPtr != NULL && mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates)) == Maze::EntryType::EMPTY)
 				{
 					sf::Vector2f robotPosition = rectPtr->getPosition();
 					robotPosition.x += rectPtr->getSize().x/2;
 					robotPosition.y += rectPtr->getSize().y/2;
 					robot->setPosition(robotPosition);
-					this->changeState(GameState::SET_ALGORITHM);
-				}
-				else
-				{
-					// do nothing
+					this->changeState(GameState::RUNNING);
 				}
 			}
 		}
@@ -152,18 +183,6 @@ void Game::handleInput(sf::RenderWindow& window)
 			if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
 			{
 				this->changeState(GameState::PAUSED);
-			}
-			else if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
-			{
-				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-				sf::Vector2i tileCoordinates = mazeDisplay->getTileIndexAtPixel(window.mapPixelToCoords(pixelCoordinates));
-				mazeDisplay->setMark(tileCoordinates.x, tileCoordinates.y, sf::Color::Yellow, "test");
-			}
-			else if(sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
-			{
-				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-				sf::Vector2i tileCoordinates = mazeDisplay->getTileIndexAtPixel(window.mapPixelToCoords(pixelCoordinates));
-				mazeDisplay->clearMark(tileCoordinates.x, tileCoordinates.y);
 			}
 		}
 		else if (gameState == PAUSED)
@@ -187,25 +206,10 @@ void Game::enterState(GameState gameState)
 {
 	if (gameState == SET_POSITION)
 	{
-		indicator.setSize(sf::Vector2f(64, 64));
-		indicator.setFillColor(sf::Color::Transparent);
-		indicator.setOutlineColor(sf::Color::Red);
-		indicator.setOutlineThickness(5);
-		indicator.setPosition(-999,-999);
-	}
-	else if (gameState == SET_ALGORITHM)
-	{
-		button1->setPosition(sf::Vector2f(200, 50) + viewPosition);
-		button2->setPosition(sf::Vector2f(500, 50) + viewPosition);
+		indicator.setColor(sf::Color::Transparent);
 	}
 	else if (gameState == RUNNING)
 	{
-		textDisplay.setFont(HUDFont);
-		textDisplay.setCharacterSize(28);
-		textDisplay.setFillColor(sf::Color::White);
-		textDisplay.setOutlineColor(sf::Color::Black);
-		textDisplay.setOutlineThickness(2);
-		textDisplay.setPosition(viewPosition);
 		if (this->algorithmType == AlgorithmType::BFS)
 		{
 			textDisplay.setString("RUNNING BFS");
@@ -217,64 +221,31 @@ void Game::enterState(GameState gameState)
 	}
 	else if (gameState == PAUSED)
 	{
-		textDisplay.setFont(HUDFont);
-		textDisplay.setCharacterSize(28);
-		textDisplay.setFillColor(sf::Color::White);
-		textDisplay.setOutlineColor(sf::Color::Black);
-		textDisplay.setOutlineThickness(2);
 		textDisplay.setString("SIMULATION PAUSED");
-		textDisplay.setPosition(viewPosition);
 	}
 }
 
-void Game::exitState(GameState gameState)
+void Game::addGameObject(GameObject* gameObjectPtr, GameState gameState, int layer)
 {
-	if (gameState == SET_POSITION)
-	{
-		indicator.setPosition(-999, -999);
-	}
-	else if (gameState == SET_ALGORITHM)
-	{
-		button1->setPosition(-999, -999);
-		button2->setPosition(-999, -999);
-	}
-	else if (gameState == RUNNING)
-	{
-		textDisplay.setPosition(-999, -999);
-	}
-	else if (gameState == PAUSED)
-	{
-		textDisplay.setPosition(-999, -999);
-	}
+	this->layerMap[layer].push_back(gameObjectPtr);
+	this->gameObjects[gameObjectPtr].insert(gameState);
 }
+
+void Game::exitState(GameState gameState) {}
 
 /**
 	Updates GameObjects, given that there has been deltaTime since the last update.
 **/
 void Game::update(sf::Time deltaTime)
 {
-	if (gameState == SET_POSITION)
+	for(auto&& gameObject : gameObjects)
 	{
-
-	}
-	else if (gameState == SET_ALGORITHM)
-	{
-		button1->setPosition(sf::Vector2f(200, 50) + viewPosition);
-		button2->setPosition(sf::Vector2f(500, 50) + viewPosition);
-	}
-	else if (gameState == RUNNING)
-	{
-		for(auto&& gameObject : gameObjects)
+		// if gameObject is part of the current state, update it
+		if (gameObject.second.find(gameState) != gameObject.second.end())
 		{
-			gameObject->update(deltaTime);
+			gameObject.first->update(deltaTime);
 		}
-		textDisplay.setPosition(viewPosition);
 	}
-	else if (gameState == PAUSED)
-	{
-		textDisplay.setPosition(viewPosition);
-	}
-	
 }
 
 /**
@@ -282,29 +253,31 @@ void Game::update(sf::Time deltaTime)
 **/
 void Game::draw(sf::RenderTarget& target)
 {
-	for(auto const &gameObjectPtr : gameObjects)
+	for (int currentLayer = NUM_LAYERS - 1; currentLayer >= 0; currentLayer--)
 	{
-		if (GameSprite* gameSprite = dynamic_cast<GameSprite*>(gameObjectPtr))
+		target.setView(layerView[currentLayer]);
+		for(auto const &gameObjectPtr : layerMap[currentLayer])
 		{
-			gameSprite->draw(target, sf::RenderStates::Default);
+			if (gameObjects[gameObjectPtr].find(gameState) != gameObjects[gameObjectPtr].end())
+			{
+				if (GameSprite* gameSprite = dynamic_cast<GameSprite*>(gameObjectPtr))
+				{
+					gameSprite->draw(target, sf::RenderStates::Default);
+				}
+			}
 		}
 	}
+	target.setView(layerView[1]);
 	if (gameState == SET_POSITION)
 	{
 		target.draw(indicator);
 	}
-	else if (gameState == RUNNING)
-	{
-		target.draw(textDisplay);
-	}
-	else if (gameState == PAUSED)
-	{
-		target.draw(textDisplay);
-	}
+	target.setView(layerView[0]);
+	target.draw(textDisplay);
 }
 
 void Game::setAlgorithm(AlgorithmType algorithmType)
 {
 	this->algorithmType = algorithmType;
-	changeState(GameState::RUNNING);
+	changeState(GameState::SET_POSITION);
 }

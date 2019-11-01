@@ -52,6 +52,7 @@ public:
 		sprite.setSize(sf::Vector2f(250,50));
 		sprite.setFillColor(sf::Color::Black);
 		sprite.setOutlineThickness(4);
+		engaged = false;
 		setState(NORMAL);
 	}
 
