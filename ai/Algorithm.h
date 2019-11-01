@@ -27,7 +27,7 @@ public:
         SearchState test = fringe.front();
         return test == this->goalstate;
     };
-    std::deque<SearchState> getFringe(){
+    virtual std::deque<SearchState> getFringe(){
         return this->fringe;
     }
 protected:
@@ -35,10 +35,10 @@ protected:
         for(int i = 0; i < this->maze.getSize().x; ++i){
             for (int j = 0; j < this->maze.getSize().y; ++j){
                 if (maze(i, j) == Maze::END){
-                    goalState.location = {i, j};
+                    goalState.location = sf::Vector2i(i, j);
                 }
                 if (maze(i, j) == Maze::KEY){
-                    goalState.keys.add({i, j})
+                    goalState.keys.add(sf::Vector2i(i, j));
                 }
             }
         }

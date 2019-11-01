@@ -5,7 +5,7 @@
 
 #include <vector>
 
-BFSAlgo::void start(){
+void BFSAlgo::start(){
     SearchState first;
     first.location = maze.getStart();
     fringe.push_front(first);
@@ -15,7 +15,7 @@ BFSAlgo::void start(){
         parent[i].resize(maze.getSize().x);
     }
 }
-BFSAlgo::SearchState next(){
+SearchState BFSAlgo::next(){
     if (fringe.empty()){
         return SearchState(-1, -1);
     }
@@ -39,7 +39,7 @@ BFSAlgo::SearchState next(){
     }
     return s;
 }
-BFSAlgo::std::vector<SearchState> getSolution(){
+std::vector<SearchState> BFSAlgo::getSolution(){
     if (not this->finished()){
         return std::vector<sf::SearchState>(0);
     }
