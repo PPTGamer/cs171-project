@@ -52,3 +52,6 @@ std::vector<SearchState> BFSAlgo::getSolution(){
     }
     return solution;
 }
+std::deque<SearchState> BFSAlgo::getFringe(){
+        return this->fringe;
+    }

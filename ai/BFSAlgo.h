@@ -13,5 +13,6 @@ public:
     void start();
     SearchState next();
     std::vector<SearchState> getSolution();
+    std::deque<SearchState> getFringe();
 };
 #endif

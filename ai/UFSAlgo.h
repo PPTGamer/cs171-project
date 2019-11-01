@@ -15,6 +15,6 @@ public:
     void start();
     SearchState next();
     std::vector<SearchState> getSolution();
-    std::priority_queue<SearchState> prio;
+    std::priority_queue<SearchState> getFringe();
 };
 #endif

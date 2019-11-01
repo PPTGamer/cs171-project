@@ -27,9 +27,7 @@ public:
         SearchState test = fringe.front();
         return test == this->goalstate;
     };
-    virtual std::deque<SearchState> getFringe(){
-        return this->fringe;
-    }
+    
 protected:
     void fillGoalState{
         for(int i = 0; i < this->maze.getSize().x; ++i){

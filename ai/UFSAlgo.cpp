@@ -4,8 +4,9 @@
 #include "Maze.h"
 
 #include <vector>
+#include <priority_queue>
 
-UFSAlgo::void start(){
+void UFSAlgo::start(){
     SearchState first;
     first.location = maze.getStart();
     first.cost = 0;
@@ -16,7 +17,7 @@ UFSAlgo::void start(){
         parent[i].resize(maze.getSize().x);
     }
 }
-UFSAlgo::SearchState next(){
+SearchState UFSAlgo::next(){
     if (fringe.empty()){
         return SearchState(-1, -1);
     }
@@ -29,10 +30,17 @@ UFSAlgo::SearchState next(){
         SearchState t(nx, ny);
         if (this->maze(nx, ny) != Maze::WALL and 
             not this->maze.outOfBounds(nx, ny) and 
-            this->parent[ny][nx].location == sf::Vector2i(0, 0)) // this works because 0,0 is guaranteed to be a wall
+            this->parent[ny][nx].location == sf::Vector2i(0, 0) // this works because 0,0 is guaranteed to be a wall
+           ) 
         {
             if (this->maze(nx, ny) == Maze::KEY){
                 t.keys.append({nx, ny});
+            }
+            if (this->maze(nx, ny) == Maze::ROCKY){
+                t.cost += 3;
+            }
+            else{
+                t.cost += 1;
             }
             fringe.push_back(t);
             this->parent[ny][nx] = s;
@@ -40,7 +48,7 @@ UFSAlgo::SearchState next(){
     }
     return s;
 }
-UFSAlgo::std::vector<SearchState> getSolution(){
+std::vector<SearchState> UFSAlgo::getSolution(){
     if (not this->finished()){
         return std::vector<sf::SearchState>(0);
     }
@@ -53,6 +61,6 @@ UFSAlgo::std::vector<SearchState> getSolution(){
     }
     return solution;
 }
-UFSAlgo::getFringe(){
+std::priority_queue<SearchState> UFSAlgo::getFringe(){
     return this->prio;
 }
