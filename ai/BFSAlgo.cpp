@@ -28,7 +28,7 @@ BFSAlgo::SearchState next(){
         SearchState t(nx, ny);
         if (this->maze(nx, ny) != Maze::WALL and 
             not this->maze.outOfBounds(nx, ny) and 
-            this->parent[ny][nx] == sf::Vector2i(0, 0)) // this works because 0,0 is guaranteed to be a wall
+            this->parent[ny][nx].location == sf::Vector2i(0, 0)) // this works because 0,0 is guaranteed to be a wall
         {
             if (this->maze(nx, ny) == Maze::KEY){
                 t.keys.append({nx, ny});
