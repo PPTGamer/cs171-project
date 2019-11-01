@@ -7,16 +7,21 @@
 #include <vector>
 #include <queue>
 
+#include "SearchState.h"
+#include "Maze.h"
+#include "Algorithm.h"
+#include "UCSAlgo.h"
+
+#include <vector>
+#include <SFML/Graphics.hpp>
+
 void UCSAlgo::start(){
-    SearchState first;
     first.location = maze.getStart();
-    first.cost = 0;
-    prio.push(first);
+    prio.insert(first);
+    parent[first] = SearchState(-2, -2);
     fillGoalState();
-    parent.resize(maze.getSize().y);
-    for (int i = 0; i < maze.getSize().y; i++){
-        parent[i].resize(maze.getSize().x, SearchState(0, 0));
-    }
+    std::cout << "Starting: " << first.location.x << ' ' << first.location.y << std::endl;
+    std::cout << "Ending: " << goalstate.location.x << ' ' << goalstate.location.y << std::endl;
 }
 SearchState UCSAlgo::next(){
     if (fringe.empty()){
@@ -24,27 +29,24 @@ SearchState UCSAlgo::next(){
     }
     int dx[4] = {0, -1, 0, 1};
     int dy[4] = {-1, 0, 1, 0};
-    SearchState s = prio.top(); prio.pop();
-    this->parent[s.location.y][s.location.x] = SearchState();
+    SearchState s = *prio.rbegin(); prio.rbegin();
+    //std::cout << s << std::endl;
     for (int i = 0; i < 4; ++i){
         int nx = s.location.x + dx[i], ny = s.location.y + dy[i];
         SearchState t(nx, ny);
+        for (auto key : s.keys){
+            t.keys.insert(key);
+        }
         if (this->maze(nx, ny) != Maze::WALL and 
-            not this->maze.out_of_bounds(nx, ny) and 
-            this->parent[ny][nx] == SearchState() // this works because 0,0 is guaranteed to be a wall
-           ) 
+            not this->maze.out_of_bounds(nx, ny) ) 
         {
-            if (this->maze(nx, ny) == Maze::KEY){
-                t.keys.insert({nx, ny});
+            if (this->parent.find(t) == parent.end()){
+                if (this->maze(nx, ny) == Maze::KEY){
+                    t.keys.insert({nx, ny});
+                }
+                this->parent[t] = s;
+                fringe.push_back(t);
             }
-            if (this->maze(nx, ny) == Maze::ROCKY){
-                t.cost += 3;
-            }
-            else{
-                t.cost += 1;
-            }
-            fringe.push_back(t);
-            this->parent[ny][nx] = s;
         }
     }
     return s;
@@ -53,18 +55,22 @@ std::vector<SearchState> UCSAlgo::getSolution(){
     if (not this->finished()){
         return std::vector<SearchState>(0);
     }
-    int gx = this->goalstate.location.x, gy = this->goalstate.location.y;
-    solution.push_back(SearchState(gx, gy));
-    while(not(parent[gy][gx].location == sf::Vector2i(0, 0))){
-        solution.push_back(parent[gy][gx]);
-        gy = parent[gy][gx].location.y;
-        gx = parent[gy][gx].location.x;
+    SearchState last = goalstate;
+    std::cout << "solution:" << std::endl;
+    while(not (parent[last] == SearchState(-2, -2))){
+        solution.push_back(last);
+        last = parent[last];
     }
+    solution.push_back(last);
+    std::reverse(solution.begin(), solution.end());
+
     return solution;
 }
-std::priority_queue<SearchState> UCSAlgo::getFringe(){
-    return this->prio;
+std::deque<SearchState> UCSAlgo::getFringe(){
+    std::deque<SearchState> x;
+    x.assign(prio.begin(), prio.end());
+    return x;
 }
 bool UCSAlgo::finished(){
-    return prio.top() == goalstate;
+    return fringe.front() == goalstate;
 }

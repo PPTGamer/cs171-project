@@ -9,13 +9,12 @@
 class UCSAlgo : public Algorithm
 {
 private:
-    std::vector<std::vector<SearchState> > parent;
-    std::priority_queue<SearchState> prio;
+    std::set<SearchState> prio;
 public:
     void start() override;
     SearchState next() override;
     std::vector<SearchState> getSolution() override;
+    std::deque<SearchState> getFringe() override;
     bool finished() override;
-    std::priority_queue<SearchState> getFringe();
 };
 #endif

@@ -8,10 +8,9 @@
 
 void BFSAlgo::start(){
     first.location = maze.getStart();
-    parent[first] = SearchState(-2, -2);
     fringe.push_front(first);
+    parent[first] = SearchState(-2, -2);
     fillGoalState();
-    visited.resize(maze.getSize().y);
     std::cout << "Starting: " << first.location.x << ' ' << first.location.y << std::endl;
     std::cout << "Ending: " << goalstate.location.x << ' ' << goalstate.location.y << std::endl;
 }
@@ -22,19 +21,23 @@ SearchState BFSAlgo::next(){
     int dx[4] = {0, -1, 0, 1};
     int dy[4] = {-1, 0, 1, 0};
     SearchState s = fringe.front(); fringe.pop_front();
-
+    //std::cout << s << std::endl;
     for (int i = 0; i < 4; ++i){
         int nx = s.location.x + dx[i], ny = s.location.y + dy[i];
         SearchState t(nx, ny);
+        for (auto key : s.keys){
+            t.keys.insert(key);
+        }
         if (this->maze(nx, ny) != Maze::WALL and 
-            not this->maze.out_of_bounds(nx, ny) and 
-            this->parent.find(t) == parent.end()) 
+            not this->maze.out_of_bounds(nx, ny) ) 
         {
-            if (this->maze(nx, ny) == Maze::KEY){
-                t.keys.insert({nx, ny});
+            if (this->parent.find(t) == parent.end()){
+                if (this->maze(nx, ny) == Maze::KEY){
+                    t.keys.insert({nx, ny});
+                }
+                this->parent[t] = s;
+                fringe.push_back(t);
             }
-            this->parent[t] = s;
-            fringe.push_back(t);
         }
     }
     return s;
@@ -44,14 +47,14 @@ std::vector<SearchState> BFSAlgo::getSolution(){
         return std::vector<SearchState>(0);
     }
     SearchState last = goalstate;
-    std::cout << parent[last] << std::endl;
-    solution.push_back(last);
+    std::cout << "solution:" << std::endl;
     while(not (parent[last] == SearchState(-2, -2))){
-        solution.push_back(parent[last]);
+        solution.push_back(last);
         last = parent[last];
     }
+    solution.push_back(last);
     std::reverse(solution.begin(), solution.end());
-    std::cout << "solution produced" << std::endl;
+
     return solution;
 }
 std::deque<SearchState> BFSAlgo::getFringe(){

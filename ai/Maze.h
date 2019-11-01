@@ -116,7 +116,7 @@ private:
 				int ny = py + dy[order[i]];
 				if (out_of_bounds(nx, ny)) continue;
 				if (v[ny][nx] == WALL){
-					v[py][px] = v[ny][nx] = EMPTY;
+					v[py][px] = v[ny][nx] = chooseTerrain();
 					fringe.push_back(sf::Vector2i(nx, ny));
 				}
 			}
@@ -136,7 +136,7 @@ private:
 		std::uniform_int_distribution<std::mt19937::result_type> dist_height(1, height - 2);
 
 		int number_of_keys = dist_keys(rng);
-		number_of_keys = 0;
+		//number_of_keys = 1;
 		std::cout << "Generating " << number_of_keys << " keys" << std::endl;
 		while(number_of_keys > 0){
 			int randx = dist_width(rng), randy = dist_height(rng);
