@@ -1,7 +1,7 @@
-#include "Algorithm.h"
-#include "BFSAlgo.h"
 #include "SearchState.h"
 #include "Maze.h"
+#include "Algorithm.h"
+#include "BFSAlgo.h"
 
 #include <vector>
 #include <SFML/Graphics.hpp>
@@ -14,6 +14,7 @@ void BFSAlgo::start(){
     parent.resize(maze.getSize().y);
     for (int i = 0; i < maze.getSize().y; i++){
         parent[i].resize(maze.getSize().x);
+        visited[i].resize(maze.getSize().x, false);
     }
 }
 SearchState BFSAlgo::next(){
@@ -23,13 +24,14 @@ SearchState BFSAlgo::next(){
     int dx[4] = {0, -1, 0, 1};
     int dy[4] = {-1, 0, 1, 0};
     SearchState s = fringe.front(); fringe.pop_front();
-    this->parent[s.location.y][s.location.x] = SearchState();
+    this->parent[s.location.y][s.location.x] = SearchState(0, 0);
+    this->visited[s.location.y][s.location.x] = true;
     for (int i = 0; i < 4; ++i){
         int nx = s.location.x + dx[i], ny = s.location.y + dy[i];
         SearchState t(nx, ny);
         if (this->maze(nx, ny) != Maze::WALL and 
             not this->maze.out_of_bounds(nx, ny) and 
-            this->parent[ny][nx] == SearchState() // this works because 0, 0 is guaranteed to be a wall
+            not this->visited[ny][nx] // this works because 0, 0 is guaranteed to be a wall
            ) 
         {
             if (this->maze(nx, ny) == Maze::KEY){
@@ -56,4 +58,7 @@ std::vector<SearchState> BFSAlgo::getSolution(){
 }
 std::deque<SearchState> BFSAlgo::getFringe(){
         return this->fringe;
-    }
+}
+bool BFSAlgo::finished(){
+    return fringe.front() == goalstate;
+}

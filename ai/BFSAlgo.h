@@ -9,10 +9,12 @@ class BFSAlgo : public Algorithm
 {
 private:
     std::vector<std::vector<SearchState> > parent;
+    std::vector<std::vector<bool> > visited;
 public:
-    void start();
-    SearchState next();
-    std::vector<SearchState> getSolution();
+    void start() override;
+    SearchState next() override;
+    std::vector<SearchState> getSolution()  override;
+    bool finished() override;
     std::deque<SearchState> getFringe();
 };
 #endif

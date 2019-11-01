@@ -22,10 +22,7 @@ public:
     virtual void start() = 0;
     virtual SearchState next() = 0;
     virtual std::vector<SearchState> getSolution() = 0;
-    bool finished(){
-        SearchState test = fringe.front();
-        return test == this->goalstate;
-    }
+    virtual bool finished() = 0;
     
 protected:
     void fillGoalState(){
@@ -35,7 +32,7 @@ protected:
                     goalstate.location = sf::Vector2i(i, j);
                 }
                 if (maze(i, j) == Maze::KEY){
-                    goalstate.keys.insert(sf::Vector2i(i, j));
+                    goalstate.keys.insert({i, j});
                 }
             }
         }

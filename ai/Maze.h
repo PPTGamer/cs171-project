@@ -5,6 +5,7 @@
 #include <random>
 #include <vector>
 #include <deque>
+#include <SFML/Graphics.hpp>
 /*
  * Usage: Maze maze(width, height)
  * maze.generate() to do the thing
@@ -64,7 +65,19 @@ public:
 		randomDFS();
 		randomKeys();
 		randomEnd();
-		printMaze();
+	}
+	void printMaze(){
+		for (auto row : v){
+			for (int cell : row){
+				if (cell == WALL)
+					std::cout << '#';
+				else if (cell == EMPTY)
+					std::cout << '.';
+				else
+					std::cout << cell;
+			}
+			std::cout << std::endl;
+		}
 	}
 private:
 	sf::Vector2i gen_start(){
@@ -119,7 +132,7 @@ private:
 
 		std::random_device dev;
 		std::mt19937 rng(dev());
-		std::uniform_int_distribution<std::mt19937::result_type> dist_keys(1, empty / 5); // There are at most 20% of empty cells as cells with keys
+		std::uniform_int_distribution<std::mt19937::result_type> dist_keys(1, 4); // There are at most 20% of empty cells as cells with keys
 		std::uniform_int_distribution<std::mt19937::result_type> dist_width(1, width - 2);
 		std::uniform_int_distribution<std::mt19937::result_type> dist_height(1, height - 2);
 
@@ -138,7 +151,7 @@ private:
 		std::mt19937 rng(dev());
 		std::uniform_int_distribution<std::mt19937::result_type> dist_terrain(0, 4); //20% chance that an "EMPTY" cell will be "ROCKY"
 		if (dist_terrain(rng) < 4) return EMPTY;
-		return ROCKY;
+		return ROUGH;
 	}
 	void randomEnd(){
 		auto endCandidate = this->gen_cell();
@@ -147,19 +160,6 @@ private:
 		}
 		this->end = endCandidate;
 		v[endCandidate.x][endCandidate.y] = END;
-	}
-	void printMaze(){
-		for (auto row : v){
-			for (int cell : row){
-				if (cell == WALL)
-					std::cout << '#';
-				else if (cell == EMPTY)
-					std::cout << '.';
-				else
-					std::cout << cell;
-			}
-			std::cout << std::endl;
-		}
 	}
 };
 
