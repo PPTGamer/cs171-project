@@ -25,13 +25,13 @@ SearchState UFSAlgo::next(){
     int dx[4] = {0, -1, 0, 1};
     int dy[4] = {-1, 0, 1, 0};
     SearchState s = prio.top(); prio.pop();
-    this->parent[s.location.y][s.location.x] = SearchState(0, 0);
+    this->parent[s.location.y][s.location.x] = SearchState();
     for (int i = 0; i < 4; ++i){
         int nx = s.location.x + dx[i], ny = s.location.y + dy[i];
         SearchState t(nx, ny);
         if (this->maze(nx, ny) != Maze::WALL and 
             not this->maze.out_of_bounds(nx, ny) and 
-            this->parent[ny][nx].location == sf::Vector2i(0, 0) // this works because 0,0 is guaranteed to be a wall
+            this->parent[ny][nx] == SearchState() // this works because 0,0 is guaranteed to be a wall
            ) 
         {
             if (this->maze(nx, ny) == Maze::KEY){
