@@ -61,6 +61,13 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	indicator.setFillColor(sf::Color::Transparent);
 	indicator.setOutlineThickness(5);
 
+	textureManager.loadTexture("Background.png");
+	Background* background = new Background(textureManager.getTexture("Background.png"), window);
+	addGameObject(background, GameState::SET_ALGORITHM, 2);
+	addGameObject(background, GameState::SET_POSITION, 2);
+	addGameObject(background, GameState::RUNNING, 2);
+	addGameObject(background, GameState::PAUSED, 2);
+
 	this->enterState(GameState::SET_POSITION);
 	
 	std::cout<<"loading time:"<<loadingTime.restart().asMilliseconds()<<"ms"<<std::endl;
