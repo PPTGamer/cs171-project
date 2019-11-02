@@ -102,6 +102,7 @@ private:
 		std::deque<sf::Vector2i> fringe;
 		sf::Vector2i generated_startpos = gen_start(rng);
 		this->start = generated_startpos;
+		this->v[start.y][start.x] = START;
 		fringe.push_back(this->start);
 		std::cout << "starting coordinates: " << this->start.x << ' ' << this->start.y << std::endl;
 		while(not fringe.empty()){
