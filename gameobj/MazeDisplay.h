@@ -31,14 +31,14 @@ private:
 			{
 				tiles[x][y].setSize(sf::Vector2f(TILE_SIZE,TILE_SIZE));
 				tiles[x][y].setPosition(sf::Vector2f(x*TILE_SIZE,y*TILE_SIZE) + position);
-
+				int offset = rand()%4;
 				if(textureMap.find(maze(x,y)) != textureMap.end())
 				{
 					if (tiles[x][y].getTexture() != textureMap[maze(x,y)])
 					{
 						int numTiles = textureMap[maze(x,y)]->getSize().x / TILE_SIZE;
 						tiles[x][y].setTexture(textureMap[maze(x,y)]);
-						tiles[x][y].setTextureRect(sf::IntRect((rand() % numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
+						tiles[x][y].setTextureRect(sf::IntRect(((x*y + y*(x%2) + offset)% numTiles)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE));
 					}
 				}
 				else

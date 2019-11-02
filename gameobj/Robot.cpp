@@ -162,6 +162,13 @@ void Robot::update(sf::Time deltaTime)
 		else if (current.x > destination.x) spriteState = LEFT;
 	}
 	
+	sf::Vector2i tileIndex = mazeDisplay->getTileIndexAtPixel(sprite.getPosition());
+	if (mazeDisplay->getMazeEntry(tileIndex.x, tileIndex.y) == Maze::EntryType::ROCKY)
+	{
+		speed = 2;
+	}
+	else speed = 5;
+
 	// Sprite position
 	sf::Vector2f offset;
 	switch (spriteState)
