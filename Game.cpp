@@ -68,7 +68,7 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	controlDisplay.setFillColor(sf::Color::White);
 	controlDisplay.setOutlineColor(sf::Color::Black);
 	controlDisplay.setOutlineThickness(1);
-	controlDisplay.setPosition(sf::Vector2f(0,550));
+	controlDisplay.setPosition(sf::Vector2f(0,520));
 	controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out");
 
 	indicator.setColor(sf::Color::Transparent);
@@ -251,6 +251,14 @@ void Game::handleInput(sf::RenderWindow& window)
 			{
 				this->changeState(GameState::RUNNING);
 			}
+			if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+			{
+				robot->clearMovementQueue();
+				mazeDisplay->clearAllMarks();
+				delete algorithm;
+				algorithm = NULL;
+				this->changeState(GameState::SET_ALGORITHM);
+			}
 		}
 		else if (gameState == END)
 		{
@@ -275,38 +283,45 @@ void Game::enterState(GameState gameState)
 {
 	if (gameState == SET_ALGORITHM)
 	{
-		textDisplay.setString("CHOOSE AN ALGORITHM. PRESS R TO REGENERATE MAZE");
+		textDisplay.setString("CHOOSE AN ALGORITHM.");
+		controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nR - regenerate maze");
 		mazeDisplay->setMaze(maze); // reset the maze;
 	}
 	if (gameState == SET_POSITION)
 	{
 		textDisplay.setString("CLICK TO SET STARTING POSITION");
+		controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out");
 		indicator.setColor(sf::Color::Transparent);
 	}
 	else if (gameState == RUNNING)
 	{
 		if (this->algorithmType == AlgorithmType::BFS)
 		{
-			textDisplay.setString("RUNNING BFS, PRESS SPACE TO PAUSE");
+			textDisplay.setString("RUNNING BFS");
+			controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Pause\nEsc: Abort");
 		}
 		if (this->algorithmType == AlgorithmType::DFS)
 		{
-			textDisplay.setString("RUNNING DFS, PRESS SPACE TO PAUSE");
+			textDisplay.setString("RUNNING DFS");
+			controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Pause\nEsc: Abort");
 		}
 		if (this->algorithmType == AlgorithmType::UCS)
 		{
-			textDisplay.setString("RUNNING UCS, PRESS SPACE TO PAUSE");
+			textDisplay.setString("RUNNING UCS");
+			controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Pause\nEsc: Abort");
 		}
 	}
 	else if (gameState == PAUSED)
 	{
 		textDisplay.setString("SIMULATION PAUSED");
+		controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Unpause\nEsc: Abort");
 	}
 	else if (gameState == END)
 	{
 		delete algorithm;
 		algorithm = NULL;
-		textDisplay.setString("DONE, PRESS SPACE TO REDO");
+		textDisplay.setString("DONE, PRESS SPACE TO RESTART");
+		controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out");
 	}
 }
 
