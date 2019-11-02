@@ -4,8 +4,10 @@
 int main()
 {
 	srand(time(NULL)); // required since C++11 <random> does not work properly on some versions of MinGW GCC
-	// create an 800x600 window, respect DPI settings.
-	sf::RenderWindow window(sf::VideoMode(800, 600, sf::VideoMode::getDesktopMode().bitsPerPixel), "SFML works!");
+	// create an 800x600 window, respect DPI settings, disable antialiasing.
+	sf::ContextSettings settings;
+	settings.antialiasingLevel = 0;
+	sf::RenderWindow window(sf::VideoMode(800, 600, sf::VideoMode::getDesktopMode().bitsPerPixel), "SFML works!", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 	
 	Game* game = new Game(window);

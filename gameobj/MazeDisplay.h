@@ -205,7 +205,7 @@ public:
 		int column = tileIndex.x, row = tileIndex.y;
 		if (column < 0 || row < 0 || column >= maze.getSize().x || row >= maze.getSize().y)
 		{
-			return Maze::EntryType::EMPTY;
+			return Maze::EntryType::INVALID;
 		}
 		else
 		{

@@ -67,7 +67,8 @@ private:
 	MazeDisplay* mazeDisplay;
 	sf::Sprite indicator;
 	sf::Text textDisplay;
-
+	sf::Text controlDisplay;
+	
 	// Temporary, add to a font manager later
 	sf::Font HUDFont;
 };

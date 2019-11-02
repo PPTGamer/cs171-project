@@ -36,7 +36,7 @@ void Robot::moveTo(sf::Vector2f destination)
 	movementQueue.push_back(destination);
 	sf::CircleShape indicator;
 	indicator.setPointCount(6);
-	indicator.setRadius(10);
+	indicator.setRadius(7);
 	indicator.setOrigin(indicator.getRadius(), indicator.getRadius());
 	indicator.setFillColor(sf::Color::Red);
 	indicator.setPosition(destination);

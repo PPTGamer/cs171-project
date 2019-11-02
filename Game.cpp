@@ -62,6 +62,14 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	textDisplay.setFillColor(sf::Color::White);
 	textDisplay.setOutlineColor(sf::Color::Black);
 	textDisplay.setOutlineThickness(2);
+	
+	controlDisplay.setFont(HUDFont);
+	controlDisplay.setCharacterSize(14);
+	controlDisplay.setFillColor(sf::Color::White);
+	controlDisplay.setOutlineColor(sf::Color::Black);
+	controlDisplay.setOutlineThickness(1);
+	controlDisplay.setPosition(sf::Vector2f(0,550));
+	controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out");
 
 	indicator.setColor(sf::Color::Transparent);
 	indicator.setTexture(*textureManager.getTexture("robotsprite.png"));
@@ -216,7 +224,11 @@ void Game::handleInput(sf::RenderWindow& window)
 		}
 		else if (gameState == SET_ALGORITHM)
 		{
-			// no input events
+			if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R)
+			{
+				maze.generate();
+				mazeDisplay->setMaze(maze);
+			}
 		}
 		else if (gameState == RUNNING)
 		{
@@ -263,7 +275,7 @@ void Game::enterState(GameState gameState)
 {
 	if (gameState == SET_ALGORITHM)
 	{
-		textDisplay.setString("CHOOSE AN ALGORITHM");
+		textDisplay.setString("CHOOSE AN ALGORITHM. PRESS R TO REGENERATE MAZE");
 		mazeDisplay->setMaze(maze); // reset the maze;
 	}
 	if (gameState == SET_POSITION)
@@ -390,6 +402,7 @@ void Game::draw(sf::RenderTarget& target)
 	}
 	target.setView(layerView[0]);
 	target.draw(textDisplay);
+	target.draw(controlDisplay);
 }
 
 void Game::setAlgorithm(AlgorithmType algorithmType)
