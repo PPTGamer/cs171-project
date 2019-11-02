@@ -3,6 +3,7 @@
 
 int main()
 {
+	srand(time(NULL)); // required since C++11 <random> does not work properly on some versions of MinGW GCC
 	// create an 800x600 window, respect DPI settings.
 	sf::RenderWindow window(sf::VideoMode(800, 600, sf::VideoMode::getDesktopMode().bitsPerPixel), "SFML works!");
 	window.setFramerateLimit(60);
