@@ -101,6 +101,11 @@ public:
 		this->displayFont = font;
 		refreshTiles();
 	}
+	void setMaze(Maze maze)
+	{
+		this->maze = maze;
+		refreshTiles();
+	}
 	void setStartingPosition(sf::Vector2i position)
 	{
 		maze.setStartingPoint(position);

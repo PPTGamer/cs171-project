@@ -135,7 +135,7 @@ private:
 				if (v[i][j] == EMPTY)
 					empty++;
 
-		std::uniform_int_distribution<std::mt19937::result_type> dist_keys(1, 4);
+		std::uniform_int_distribution<std::mt19937::result_type> dist_keys(1, 3);
 		std::uniform_int_distribution<std::mt19937::result_type> dist_width(1, width - 2);
 		std::uniform_int_distribution<std::mt19937::result_type> dist_height(1, height - 2);
 

@@ -14,8 +14,7 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	{
 		std::cout<<"Unable to load font!"<<std::endl;
 	}
-	
-	Maze maze(8, 8);
+	maze = Maze(8, 8);
 	maze.generate();
 	mazeDisplay = new MazeDisplay(HUDFont, &textureManager, maze);
 	addGameObject(mazeDisplay, GameState::SET_POSITION);
@@ -188,7 +187,8 @@ void Game::handleInput(sf::RenderWindow& window)
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
 				if (rectPtr != NULL)
 				{
-					if (mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates)) == Maze::EntryType::EMPTY)
+					Maze::EntryType mazeEntry = mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates));
+					if (mazeEntry == Maze::EntryType::EMPTY || mazeEntry == Maze::EntryType::START)
 					{
 						indicator.setColor(sf::Color(255,255,255,100));
 					}
@@ -207,7 +207,8 @@ void Game::handleInput(sf::RenderWindow& window)
 			{
 				sf::Vector2i pixelCoordinates = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
 				sf::RectangleShape* rectPtr = mazeDisplay->getTileAtPixel(window.mapPixelToCoords(pixelCoordinates));
-				if (rectPtr != NULL && mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates)) == Maze::EntryType::EMPTY)
+				Maze::EntryType mazeEntry = mazeDisplay->getMazeEntryAtPixel(window.mapPixelToCoords(pixelCoordinates));
+				if (rectPtr != NULL && (mazeEntry == Maze::EntryType::EMPTY || mazeEntry == Maze::EntryType::START))
 				{
 					setPosition(mazeDisplay->getTileIndexAtPixel(window.mapPixelToCoords(pixelCoordinates)));
 				}
@@ -223,12 +224,29 @@ void Game::handleInput(sf::RenderWindow& window)
 			{
 				this->changeState(GameState::PAUSED);
 			}
+			if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+			{
+				robot->clearMovementQueue();
+				mazeDisplay->clearAllMarks();
+				delete algorithm;
+				algorithm = NULL;
+				this->changeState(GameState::SET_ALGORITHM);
+			}
 		}
 		else if (gameState == PAUSED)
 		{
 			if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
 			{
 				this->changeState(GameState::RUNNING);
+			}
+		}
+		else if (gameState == END)
+		{
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
+			{
+				robot->clearMovementQueue();
+				mazeDisplay->clearAllMarks();
+				this->changeState(GameState::SET_ALGORITHM);
 			}
 		}
 	}
@@ -243,23 +261,29 @@ void Game::changeState(GameState newGameState)
 
 void Game::enterState(GameState gameState)
 {
+	if (gameState == SET_ALGORITHM)
+	{
+		textDisplay.setString("CHOOSE AN ALGORITHM");
+		mazeDisplay->setMaze(maze); // reset the maze;
+	}
 	if (gameState == SET_POSITION)
 	{
+		textDisplay.setString("CLICK TO SET STARTING POSITION");
 		indicator.setColor(sf::Color::Transparent);
 	}
 	else if (gameState == RUNNING)
 	{
 		if (this->algorithmType == AlgorithmType::BFS)
 		{
-			textDisplay.setString("RUNNING BFS");
+			textDisplay.setString("RUNNING BFS, PRESS SPACE TO PAUSE");
 		}
 		if (this->algorithmType == AlgorithmType::DFS)
 		{
-			textDisplay.setString("RUNNING DFS");
+			textDisplay.setString("RUNNING DFS, PRESS SPACE TO PAUSE");
 		}
 		if (this->algorithmType == AlgorithmType::UCS)
 		{
-			textDisplay.setString("RUNNING UCS");
+			textDisplay.setString("RUNNING UCS, PRESS SPACE TO PAUSE");
 		}
 	}
 	else if (gameState == PAUSED)
@@ -270,7 +294,7 @@ void Game::enterState(GameState gameState)
 	{
 		delete algorithm;
 		algorithm = NULL;
-		textDisplay.setString("DONE");
+		textDisplay.setString("DONE, PRESS SPACE TO REDO");
 	}
 }
 

@@ -56,6 +56,14 @@ void Robot::executeSolution(std::vector<SearchState> solution, MazeDisplay* maze
 	}
 }
 
+void Robot::clearMovementQueue()
+{
+	indicators.clear();
+	movementQueue.clear();
+	lines.clear();
+	spriteState = STOP;
+}
+
 void Robot::handleInput(sf::Event event, sf::RenderWindow& window, GameState gameState)
 {
 	if (gameState != GameState::RUNNING) return;

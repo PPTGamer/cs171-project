@@ -38,6 +38,7 @@ public:
 	void setAlgorithm(AlgorithmType algorithmType);
 	void setPosition(sf::Vector2i tileIndex);
 private:
+	Maze maze;
 	GameState gameState;
 	AlgorithmType algorithmType;
 	Algorithm* algorithm;
