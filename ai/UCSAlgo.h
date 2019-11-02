@@ -10,6 +10,7 @@ class UCSAlgo : public Algorithm
 {
 private:
     std::set<SearchState> prio;
+    std::set<SearchState> visited_without_cost;
     SearchState arrival;
 public:
     void start() override;

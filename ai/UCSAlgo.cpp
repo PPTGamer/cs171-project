@@ -10,7 +10,7 @@
 void UCSAlgo::start(){
     first.location = maze.getStart();
     first.cost = 0;
-    prio.insert(first);
+    prio.insert(first); visited_without_cost.insert(first);
     parent[first] = SearchState(-2, -2);
     fillGoalState();
     std::cout << "Starting: " << first.location.x << ' ' << first.location.y << std::endl;
@@ -29,6 +29,8 @@ SearchState UCSAlgo::next(){
         for (auto key : s.keys){
             t.keys.insert(key);
         }
+        if (visited_without_cost.count(t) > 0) continue;
+        visited_without_cost.insert(t);
         t.cost = s.cost + 1;
         if (this->maze(nx, ny) != Maze::WALL and 
             not this->maze.out_of_bounds(nx, ny) ) 

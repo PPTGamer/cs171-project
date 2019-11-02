@@ -2,20 +2,23 @@
 #include "ai/SearchState.h"
 #include "ai/Algorithm.h"
 #include "ai/BFSAlgo.h"
-#include "ai/UFSAlgo.h"
+#include "ai/UCSAlgo.h"
 
 int main(){
-    Maze maze(9, 9);
+    Maze maze(8, 8);
     maze.generate();
     maze.printMaze();
 
-    Algorithm * bfs = new BFSAlgo();
+    Algorithm * bfs = new UCSAlgo();
     bfs->setMaze(maze);
     bfs->start();
-
+    int expansions = 0;
     while(not bfs->finished()){
-        std::cout << bfs->next() << std::endl;
+        SearchState s = bfs->next(); expansions++;
+        //std::cout << s << std::endl;
     }
+    std::cout << "It took " << expansions << " expansions to find the solution." << std::endl;
+    std::cout << "Solution" << std::endl;
     for (SearchState s : bfs->getSolution()){
         std::cout << s << std::endl;
     }

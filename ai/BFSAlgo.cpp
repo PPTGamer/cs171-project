@@ -47,7 +47,6 @@ std::vector<SearchState> BFSAlgo::getSolution(){
         return std::vector<SearchState>(0);
     }
     SearchState last = goalstate;
-    std::cout << "solution:" << std::endl;
     while(not (parent[last] == SearchState(-2, -2))){
         solution.push_back(last);
         last = parent[last];
