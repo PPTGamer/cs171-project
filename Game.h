@@ -17,6 +17,7 @@
 #include "ai/BFSAlgo.h"
 #include "ai/DFSAlgo.h"
 #include "ai/UCSAlgo.h"
+#include "ai/MazeGenerator.h"
 
 // Resource managers
 #include "managers/TextureManager.h"
@@ -29,6 +30,7 @@
 class Game
 {
 public:
+	const unsigned int MAZESIZE = 8;
 	Game(sf::RenderWindow& window);
 	~Game();
 	void changeState(GameState newGameState);

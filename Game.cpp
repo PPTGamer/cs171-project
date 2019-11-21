@@ -14,8 +14,9 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 	{
 		std::cout<<"Unable to load font!"<<std::endl;
 	}
-	maze = Maze(8, 8);
-	maze.generate();
+	
+	MazeGenerator mg{};
+	maze = mg.generate(MAZESIZE, MAZESIZE);
 	mazeDisplay = new MazeDisplay(HUDFont, &textureManager, maze);
 	addGameObject(mazeDisplay, GameState::SET_POSITION);
 	addGameObject(mazeDisplay, GameState::SET_ALGORITHM);
@@ -226,7 +227,8 @@ void Game::handleInput(sf::RenderWindow& window)
 		{
 			if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R)
 			{
-				maze.generate();
+				MazeGenerator mg{};
+				maze = mg.generate(MAZESIZE, MAZESIZE);
 				mazeDisplay->setMaze(maze);
 			}
 		}

@@ -50,25 +50,12 @@ public:
 	void setStartingPoint(const sf::Vector2i& loc){
 		this->start = loc;
 		this->v[loc.y][loc.x] = START;
-		std::cout << "starting maze game at " << "(" << loc.x << ", " << loc.y << ")" << std::endl; 
 	}
 	sf::Vector2i getStart(){
 		return this->start;
 	}
 	bool out_of_bounds(int x, int y){
 		return x <= 0 or x >= width - 1 or y <= 0 or y >= height - 1;
-	}
-	void generate(){
-		for (int i = 0; i < height; i++){
-			for (int j = 0; j < width; j++){
-				this->v[i][j] = WALL;
-			}
-		}
-		std::random_device dev;
-		std::mt19937 rng(dev());
-		randomDFS(rng);
-		randomKeys(rng);
-		randomEnd(rng);
 	}
 	void printMaze(){
 		for (auto row : v){
@@ -83,84 +70,7 @@ public:
 			std::cout << std::endl;
 		}
 	}
-private:
-	sf::Vector2i gen_start(std::mt19937& rng){
-		std::uniform_int_distribution<std::mt19937::result_type> dist_width(0, (width - 3) / 2);
-		std::uniform_int_distribution<std::mt19937::result_type> dist_height(0, (height - 3) / 2);
-		return sf::Vector2i(2 * dist_width(rng) + 1, 2 * dist_height(rng) + 1);
-		
-	}
-	sf::Vector2i gen_cell(std::mt19937& rng){
-		std::uniform_int_distribution<std::mt19937::result_type> dist_width(1, width - 2);
-		std::uniform_int_distribution<std::mt19937::result_type> dist_height(1, height - 2);
-		int randx = (int)dist_width(rng), randy = (int)dist_height(rng);
-		return sf::Vector2i(randx, randy);
-	}
-	void randomDFS(std::mt19937& rng){
-		int dx[4] = {0, -1, 0, 1};
-		int dy[4] = {-1, 0, 1, 0};
-		std::deque<sf::Vector2i> fringe;
-		sf::Vector2i generated_startpos = gen_start(rng);
-		this->setStartingPoint(generated_startpos);
-		fringe.push_back(this->start);
-		while(not fringe.empty()){
-			int cx = fringe.back().x;
-			int cy = fringe.back().y; fringe.pop_back();
-			DirectionType order[4] = {NORTH,WEST,SOUTH,EAST};
-			std::random_shuffle(order, order + 4);
-			for (int i = 0; i < 4; ++i){
-				int px = cx + dx[order[i]];
-				int py = cy + dy[order[i]];
-				int nx = px + dx[order[i]];
-				int ny = py + dy[order[i]];
-				if (out_of_bounds(nx, ny)) continue;
-				if (v[ny][nx] == WALL){
-					v[py][px] = v[ny][nx] = chooseTerrain(rng);
-					fringe.push_back(sf::Vector2i(nx, ny));
-				}
-			}
-		}
-		for (int i = 0; i<width*height/4; i++)
-		{
-			sf::Vector2i cell = gen_cell(rng);
-			if(v[cell.y][cell.x] == Maze::EntryType::WALL) 
-				v[cell.y][cell.x] = chooseTerrain(rng);
-		}
-	}
-	void randomKeys(std::mt19937& rng){
-		int empty = 0;
-		for (int i = 0; i < height; ++i)
-			for (int j = 0; j < width; ++j)
-				if (v[i][j] == EMPTY)
-					empty++;
 
-		std::uniform_int_distribution<std::mt19937::result_type> dist_keys(1, 3);
-		std::uniform_int_distribution<std::mt19937::result_type> dist_width(1, width - 2);
-		std::uniform_int_distribution<std::mt19937::result_type> dist_height(1, height - 2);
-
-		int number_of_keys = dist_keys(rng);
-		//number_of_keys = 1;
-		while(number_of_keys > 0){
-			int randx = dist_width(rng), randy = dist_height(rng);
-			if (v[randx][randy] == EMPTY){
-				this->v[randx][randy] = KEY;
-				--number_of_keys;
-			}
-		}
-	}
-	EntryType chooseTerrain(std::mt19937& rng){
-		std::uniform_int_distribution<std::mt19937::result_type> dist_terrain(0, 4); //20% chance that an "EMPTY" cell will be "ROCKY"
-		if (dist_terrain(rng) < 4) return EMPTY;
-		return ROCKY;
-	}
-	void randomEnd(std::mt19937& rng){
-		auto endCandidate = this->gen_cell(rng);
-		while(v[endCandidate.x][endCandidate.y] == KEY || endCandidate == start){
-			endCandidate = this->gen_cell(rng);
-		}
-		this->end = endCandidate;
-		v[endCandidate.x][endCandidate.y] = END;
-	}
 };
 
 #endif
