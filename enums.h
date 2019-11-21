@@ -8,7 +8,7 @@ enum GameState : int
 
 enum AlgorithmType : int
 {
-	BFS, DFS, UCS
+	BFS, DFS, UCS, ASTAR
 };
 
 #endif

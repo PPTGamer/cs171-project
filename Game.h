@@ -17,6 +17,7 @@
 #include "ai/BFSAlgo.h"
 #include "ai/DFSAlgo.h"
 #include "ai/UCSAlgo.h"
+#include "ai/ManhattanHeuristic.h"
 #include "ai/MazeGenerator.h"
 
 // Resource managers

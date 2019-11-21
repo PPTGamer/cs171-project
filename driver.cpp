@@ -2,14 +2,28 @@
 #include <random>
 
 #include "ai/Maze.h"
+#include "ai/MazeGenerator.h"
 #include "ai/SearchState.h"
 #include "ai/Algorithm.h"
 #include "ai/ManhattanHeuristic.h"
 #include "ai/UCSAlgo.h"
+
+void setRandomStarting(Maze& m, std::mt19937 rng){
+    std::uniform_int_distribution<std::mt19937::result_type> distx(0, m.getSize().x - 1);
+    std::uniform_int_distribution<std::mt19937::result_type> disty(0, m.getSize().y - 1);
+
+    m.setStartingPoint({(int)distx(rng), (int)disty(rng)});
+}
+
 int main(){
-    Maze maze(8, 8);
-    maze.generate();
+    MazeGenerator mg{};
+    Maze maze = mg.generate(8, 8);
     maze.printMaze();
+
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    setRandomStarting(maze, rng);
+    
 
     Algorithm * bfs = new ManhattanHeuristic();
     bfs->setMaze(maze);

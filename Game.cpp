@@ -54,8 +54,8 @@ Game::Game(sf::RenderWindow& window): gameState(SET_POSITION)
 
 	Button* button4 = new Button(this);
 	button4->setPosition(sf::Vector2f(50, 400));
-	button4->setText(&HUDFont, "informed search\n(not implemented yet)");
-	button4->setOnClick([](Game* game){});
+	button4->setText(&HUDFont, "Informed search (A*)");
+	button4->setOnClick([](Game* game){game->setAlgorithm(AlgorithmType::ASTAR);});
 	addGameObject(button4, GameState::SET_ALGORITHM, 0);
 
 	textDisplay.setFont(HUDFont);
@@ -312,6 +312,11 @@ void Game::enterState(GameState gameState)
 			textDisplay.setString("RUNNING UCS");
 			controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Pause\nEsc: Abort");
 		}
+		if (this->algorithmType == AlgorithmType::ASTAR)
+		{
+			textDisplay.setString("RUNNING A* (Nearest Key)");
+			controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Pause\nEsc: Abort");
+		}
 	}
 	else if (gameState == PAUSED)
 	{
@@ -436,6 +441,10 @@ void Game::setAlgorithm(AlgorithmType algorithmType)
 	else if (algorithmType == AlgorithmType::UCS)
 	{
 		algorithm = new UCSAlgo();
+	}
+	else if (algorithmType == AlgorithmType::ASTAR)
+	{
+		algorithm = new ManhattanHeuristic();
 	}
 	changeState(GameState::SET_POSITION);
 }
