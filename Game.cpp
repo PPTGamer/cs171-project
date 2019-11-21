@@ -285,50 +285,38 @@ void Game::enterState(GameState gameState)
 {
 	if (gameState == SET_ALGORITHM)
 	{
-		textDisplay.setString("CHOOSE AN ALGORITHM.");
+		textDisplay.setString("Choose an algorithm.");
 		controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nR - regenerate maze");
 		mazeDisplay->setMaze(maze); // reset the maze;
 	}
 	if (gameState == SET_POSITION)
 	{
-		textDisplay.setString("CLICK TO SET STARTING POSITION");
+		textDisplay.setString("Click to set starting position.");
 		controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out");
 		indicator.setColor(sf::Color::Transparent);
 	}
 	else if (gameState == RUNNING)
 	{
-		if (this->algorithmType == AlgorithmType::BFS)
-		{
-			textDisplay.setString("RUNNING BFS");
-			controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Pause\nEsc: Abort");
-		}
-		if (this->algorithmType == AlgorithmType::DFS)
-		{
-			textDisplay.setString("RUNNING DFS");
-			controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Pause\nEsc: Abort");
-		}
-		if (this->algorithmType == AlgorithmType::UCS)
-		{
-			textDisplay.setString("RUNNING UCS");
-			controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Pause\nEsc: Abort");
-		}
-		if (this->algorithmType == AlgorithmType::ASTAR)
-		{
-			textDisplay.setString("RUNNING A* (Nearest Key)");
-			controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Pause\nEsc: Abort");
-		}
+		std::stringstream ss;
+		ss<<"Running "<<algorithm->getName()<<".\n"<<algorithm->getNumStatesExpanded()<<" states expanded.";
+		textDisplay.setString(ss.str());
+		controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Pause\nEsc: Abort");
 	}
 	else if (gameState == PAUSED)
 	{
-		textDisplay.setString("SIMULATION PAUSED");
+		std::stringstream ss;
+		ss<<"Paused simulation of "<<algorithm->getName()<<".\n"<<algorithm->getNumStatesExpanded()<<" states expanded.";
+		textDisplay.setString(ss.str());
 		controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out\nSpace: Unpause\nEsc: Abort");
 	}
 	else if (gameState == END)
 	{
+		std::stringstream ss;
+		ss<<"Done running "<<algorithm->getName()<<".\n"<<algorithm->getNumStatesExpanded()<<" states expanded.\nPress SPACE to restart.";
+		textDisplay.setString(ss.str());
+		controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out");
 		delete algorithm;
 		algorithm = NULL;
-		textDisplay.setString("DONE, PRESS SPACE TO RESTART");
-		controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out");
 	}
 }
 
@@ -371,6 +359,7 @@ void Game::update(sf::Time deltaTime)
 			{
 				mazeDisplay->clearAllMarks();
 				robot->executeSolution(algorithm->getSolution(), mazeDisplay);
+				std::cout<<"Total states expanded: "<<algorithm->getNumStatesExpanded()<<std::endl;
 				changeState(GameState::END);
 				break;
 			}
@@ -394,6 +383,14 @@ void Game::update(sf::Time deltaTime)
 				mazeDisplay->setMark(expanded.location.x, expanded.location.y, sf::Color::Yellow);
 			}
 			algorithmTime -= timeStep;
+		}
+
+		// text display
+		if (algorithm)
+		{
+			std::stringstream ss;
+			ss<<"Running "<<algorithm->getName()<<".\n"<<algorithm->getNumStatesExpanded()<<" states expanded.";
+			textDisplay.setString(ss.str());
 		}
 	}
 }

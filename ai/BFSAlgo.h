@@ -9,10 +9,11 @@
 class BFSAlgo : public Algorithm
 {
 public:
-    void start() override;
-    SearchState next() override;
-    std::vector<SearchState> getSolution()  override;
-    bool finished() override;
-    std::deque<SearchState> getFringe() override;
+	void start() override;
+	SearchState next() override;
+	std::vector<SearchState> getSolution()  override;
+	bool finished() override;
+	std::deque<SearchState> getFringe() override;
+	std::string getName() override;
 };
 #endif
