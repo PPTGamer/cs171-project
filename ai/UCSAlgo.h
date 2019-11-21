@@ -8,7 +8,7 @@
 
 class UCSAlgo : public Algorithm
 {
-private:
+protected:
     std::set<SearchState> prio;
     std::set<SearchState> visited_without_cost;
     SearchState arrival;

@@ -4,6 +4,7 @@
 #include <deque>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 #include "Maze.h"
 #include "SearchState.h"
@@ -38,6 +39,7 @@ protected:
             for (int j = 0; j < this->maze.getSize().y; ++j){
                 if (maze(i, j) == Maze::END){
                     goalstate.location = sf::Vector2i(i, j);
+                    std::cout << "Exit is at " << "(" << i << ", " << j << ")" << std::endl;
                 }
                 if (maze(i, j) == Maze::KEY){
                     goalstate.keys.insert({i, j});

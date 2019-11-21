@@ -48,9 +48,9 @@ public:
 		}
 	}
 	void setStartingPoint(const sf::Vector2i& loc){
-		this->v[start.y][start.x] = EMPTY;
 		this->start = loc;
 		this->v[loc.y][loc.x] = START;
+		std::cout << "starting maze game at " << "(" << loc.x << ", " << loc.y << ")" << std::endl; 
 	}
 	sf::Vector2i getStart(){
 		return this->start;
@@ -101,10 +101,8 @@ private:
 		int dy[4] = {-1, 0, 1, 0};
 		std::deque<sf::Vector2i> fringe;
 		sf::Vector2i generated_startpos = gen_start(rng);
-		this->start = generated_startpos;
-		this->v[start.y][start.x] = START;
+		this->setStartingPoint(generated_startpos);
 		fringe.push_back(this->start);
-		std::cout << "starting coordinates: " << this->start.x << ' ' << this->start.y << std::endl;
 		while(not fringe.empty()){
 			int cx = fringe.back().x;
 			int cy = fringe.back().y; fringe.pop_back();
@@ -142,7 +140,6 @@ private:
 
 		int number_of_keys = dist_keys(rng);
 		//number_of_keys = 1;
-		std::cout << "Generating " << number_of_keys << " keys" << std::endl;
 		while(number_of_keys > 0){
 			int randx = dist_width(rng), randy = dist_height(rng);
 			if (v[randx][randy] == EMPTY){
