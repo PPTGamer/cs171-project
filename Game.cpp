@@ -312,7 +312,7 @@ void Game::enterState(GameState gameState)
 	else if (gameState == END)
 	{
 		std::stringstream ss;
-		ss<<"Done running "<<algorithm->getName()<<".\n"<<algorithm->getNumStatesExpanded()<<" states expanded.\nPress SPACE to restart.";
+		ss<<"Done running "<<algorithm->getName()<<".\n"<<algorithm->getNumStatesExpanded()<<" states expanded.\nTotal cost:"<<algorithm->getSolutionCost()<<"\nPress SPACE to restart.";
 		textDisplay.setString(ss.str());
 		controlDisplay.setString("Drag with the right mouse button: scroll view\nMouse wheel or Z/X: zoom in/out");
 		delete algorithm;

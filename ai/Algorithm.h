@@ -35,6 +35,20 @@ public:
 	virtual bool finished() = 0;
 	int getNumStatesExpanded(){return statesExpanded;}
 	virtual std::string getName(){return "[ALGORITHM NAME]";}
+	int getSolutionCost()
+	{
+		int totalCost = 0;
+		for (auto&& state : solution)
+		{
+			switch(maze(state.location.x, state.location.y))
+			{
+				case Maze::EntryType::START: totalCost += 0; break;
+				case Maze::EntryType::ROCKY: totalCost += 6; break;
+				default: totalCost += 1; break;
+			}
+		}
+		return totalCost;
+	}
 	
 protected:
 	void fillGoalState(){
